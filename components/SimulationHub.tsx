@@ -32,7 +32,7 @@ export const SimulationHub: React.FC<SimulationHubProps> = ({ data }) => {
 
       <div className="h-48 w-full bg-slate-900/50 border border-slate-800 rounded relative overflow-hidden">
          <div className="absolute top-2 left-2 text-[10px] text-slate-500 z-10">PENGGUNA KONKUREN vs LATENSI (ms)</div>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
@@ -56,7 +56,7 @@ export const SimulationHub: React.FC<SimulationHubProps> = ({ data }) => {
 
       <div className="h-32 w-full bg-slate-900/50 border border-slate-800 rounded relative">
         <div className="absolute top-2 left-2 text-[10px] text-slate-500 z-10">PROBABILITAS TINGKAT ERROR (%)</div>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <LineChart data={data}>
              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
              <Tooltip content={<CustomTooltip />} />

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ThemeConfig } from '../types';
 import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type } from 'lucide-react';
@@ -404,7 +403,7 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
 
       {/* Footer */}
       <div className="p-3 border-t border-zinc-800 bg-[#09090b] text-[10px] text-center text-zinc-600 font-mono">
-          NEXUS VISUAL ENGINE v4.2
+          vickymosafan VISUAL ENGINE v4.2
       </div>
     </div>
   );
