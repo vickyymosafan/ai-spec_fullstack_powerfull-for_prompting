@@ -311,20 +311,49 @@ Bertindaklah sebagai: **Principal Backend Engineer**.
 2.  **API Standards & Contract Definition (Shared Library):**
     *   **Contract-First:** Semua endpoint, Zod Schema (Request/Response/Params/Query), dan HTTP Method didefinisikan terpisah di file \`contract.ts\` menggunakan \`initContract\`.
     *   **Single Source of Truth:** Contract ini di-import oleh Frontend (React Query) dan Backend (Controller) untuk menghilangkan "API Drift".
-    *   **OpenAPI 3.1:** Jelaskan cara generate Swagger JSON otomatis dari \`contract\` object menggunakan \`generateOpenApi\`.
-    *   **Swagger UI:** Instruksi setup endpoint \`/docs\` untuk visualisasi contract.
 
-3.  **Core Architecture:**
+3.  **OpenAPI & Documentation Generation (WAJIB IMPLEMENTASI):**
+    Anda **WAJIB** menyertakan script/setup untuk generate \`openapi.json\` menggunakan library \`@ts-rest/open-api\`.
+    
+    *   **Installation:** \`pnpm add @ts-rest/open-api @anatine/zod-openapi\`.
+    *   **Schema Enhancement (Zod):**
+        Gunakan \`extendZodWithOpenApi(z)\` di awal file contract untuk mengaktifkan metadata OpenAPI.
+        Tambahkan metadata \`.openapi({ title: '...', description: '...', example: '...' })\` pada Zod Schema untuk dokumentasi yang lebih kaya.
+    
+    *   **Generation Script:**
+        Buat instruksi untuk file generate Swagger (misal: \`generate-openapi.ts\`). Gunakan konfigurasi:
+        \`\`\`ts
+        import { generateOpenApi } from '@ts-rest/open-api';
+        import { contract } from './contract';
+        
+        const openApiDocument = generateOpenApi(contract, {
+          info: { title: 'Project API', version: '1.0.0' }
+        }, {
+          setOperationId: true, // Generate readable Operation IDs
+          jsonQuery: true,      // Support JSON Query Params in Swagger
+        });
+        \`\`\`
+    
+    *   **Operation Mapping (Advanced Metadata):**
+        Jika ada kebutuhan custom tags atau security schemes (e.g. Bearer Auth), gunakan opsi \`operationMapper\`:
+        \`\`\`ts
+        operationMapper: (operation, appRoute) => ({
+          ...operation,
+          ...(appRoute.metadata?.openApiTags ? { tags: appRoute.metadata.openApiTags } : {}),
+        })
+        \`\`\`
+
+4.  **Core Architecture:**
     *   Layering: Domain Entities -> Repositories -> Services -> Controllers/Handlers.
     *   Dependency Injection: Wajib digunakan.
     *   Validation: Zod Schema di level Contract akan otomatis memvalidasi request sebelum masuk controller.
 
-4.  **Security (Zero Trust):**
+5.  **Security (Zero Trust):**
     *   Type-Safe Error Handling: Gunakan \`TsRestException\` (NestJS) atau global error handler.
     *   Auth: JWT/OAuth2 implementation.
     *   Rate Limiting & CORS.
 
-5.  **Testing Strategy:**
+6.  **Testing Strategy:**
     *   Unit Test untuk Business Logic.
     *   E2E Test menggunakan Contract untuk mocking.
 
