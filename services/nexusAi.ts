@@ -273,9 +273,37 @@ Mode: Dual (Light/Dark)
         Gunakan helper \`isFetchError\`, \`isUnknownErrorResponse\`, dan \`exhaustiveGuard\` dari \`@ts-rest/react-query/v5\`.
 
 4.  **Komponen UI:** List komponen atomik (Button, Modal, Toast) dan instruksi styling menggunakan CSS Variables dari blok [CSS_VARS].
-5.  **Halaman Utama:** List halaman yang harus dibuat berdasarkan fitur aplikasi.
-6.  **Deploy & Vercel:** Instruksi spesifik deployment ke Vercel.
-7.  **Maintainability:** Aturan ESLint, Prettier.
+5.  **Responsive Design Strategy (CORE CONCEPT - ADAPTIVE UI):**
+    Anda **WAJIB** merancang antarmuka yang sepenuhnya adaptif menggunakan **Responsive Utility Variants** Tailwind CSS.
+    Pendekatan **Mobile-First** adalah keharusan: tulis class dasar untuk mobile, lalu override dengan prefix breakpoint untuk layar yang lebih besar.
+
+    **Breakpoints Reference:**
+    *   \`sm\`: 640px (Mobile Landscape)
+    *   \`md\`: 768px (Tablet)
+    *   \`lg\`: 1024px (Laptop)
+    *   \`xl\`: 1280px (Desktop)
+    *   \`2xl\`: 1536px (Wide Screens)
+
+    **Instruksi Detail Penggunaan Class Kondisional:**
+    Setiap komponen layout utama harus memiliki varian responsif.
+    *   **Layout Grid:** \`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4\`
+    *   **Spacing/Padding:** \`p-4 md:p-6 lg:p-8\`
+    *   **Sizing:** \`w-full md:w-1/2 lg:w-1/3\`
+    *   **Typography:** \`text-sm md:text-base lg:text-lg\`
+    *   **Visibility:** \`hidden md:block\` (untuk elemen sidebar/navigasi)
+
+    **Contoh Implementasi Wajib dalam Spec:**
+    \`\`\`tsx
+    // Adaptive Card Component Example
+    <div className="w-full md:w-1/2 lg:w-1/3 p-4 md:p-6 rounded-xl border">
+      <h1 className="text-xl md:text-2xl font-bold">Responsive Title</h1>
+      <p className="text-sm md:text-base mt-2">Content scales seamlessly.</p>
+    </div>
+    \`\`\`
+
+6.  **Halaman Utama:** List halaman yang harus dibuat berdasarkan fitur aplikasi.
+7.  **Deploy & Vercel:** Instruksi spesifik deployment ke Vercel.
+8.  **Maintainability:** Aturan ESLint, Prettier.
 
 ### 2. ATURAN GENERASI: BACKEND SPEC (backendSpec)
 Bertindaklah sebagai: **Principal Backend Engineer**.

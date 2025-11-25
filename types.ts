@@ -1,4 +1,5 @@
 
+
 export enum NodeType {
   SERVICE = 'SERVICE',
   DATABASE = 'DATABASE',
@@ -120,4 +121,7 @@ export interface ThemeConfig {
   radius: number; // in rem equivalent usually, e.g. 0.5
   style: 'default' | 'new-york' | 'flat';
   mode: 'light' | 'dark';
+  
+  // Responsive Simulation
+  viewport: 'responsive' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }

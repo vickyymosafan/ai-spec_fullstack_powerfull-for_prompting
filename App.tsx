@@ -1,13 +1,19 @@
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { analyzeArchitecture } from './services/nexusAi';
 import { NexusBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
 import { NodeCanvas } from './components/NodeCanvas';
 import { SimulationHub } from './components/SimulationHub';
 import { ThemeEditor } from './components/ThemeEditor';
+import { MetricCard } from './components/MetricCard';
+import { RecentActivity } from './components/RecentActivity';
 import { 
   Mic, Send, ShieldAlert, Terminal, Activity, Code, Save, 
   GitBranch, Filter, X, Copy, Check, Layout, Settings,
-  Plus, FolderClock, MessageSquare, Trash2, Archive
+  Plus, FolderClock, MessageSquare, Trash2, Archive, Menu,
+  LayoutDashboard, Network, FileCode, Command, ChevronDown,
+  Bell, Search as SearchIcon, User, LogOut, ChevronRight,
+  PanelLeftClose, PanelLeft, MoreVertical, History
 } from 'lucide-react';
 
 const DEFAULT_CSS_TEMPLATE = `[CSS_VARS]
@@ -87,7 +93,8 @@ const DEFAULT_CSS_TEMPLATE = `[CSS_VARS]
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: {{RADIUS}}rem;
-}`;
+}
+`;
 
 const App: React.FC = () => {
   const [input, setInput] = useState('');
@@ -100,34 +107,24 @@ const App: React.FC = () => {
     secondaryForeground: '#fafafa',
     accentColor: '#3f3f46',
     accentForeground: '#fafafa',
-    // Base defaults
     background: '#09090b',
     foreground: '#fafafa',
-    // Card defaults
     card: '#09090b',
     cardForeground: '#fafafa',
-    // Popover defaults
     popover: '#09090b',
     popoverForeground: '#fafafa',
-    // Muted defaults
     muted: '#27272a',
     mutedForeground: '#a1a1aa',
-    // Destructive defaults
     destructive: '#7f1d1d',
     destructiveForeground: '#fafafa',
-    // Border & Input defaults
     border: '#27272a',
     input: '#27272a',
     ring: '#a1a1aa',
-    
-    // Chart defaults
     chart1: '#91c5ff',
     chart2: '#3a81f6',
     chart3: '#2563ef',
     chart4: '#1a4eda',
     chart5: '#1f3fad',
-
-    // Sidebar defaults
     sidebar: '#18181b',
     sidebarForeground: '#fafafa',
     sidebarPrimary: '#3f3f46',
@@ -136,12 +133,17 @@ const App: React.FC = () => {
     sidebarAccentForeground: '#fafafa',
     sidebarBorder: '#27272a',
     sidebarRing: '#a1a1aa',
-    
     radius: 0.625,
     mode: 'dark',
-    style: 'default'
+    style: 'default',
+    viewport: 'responsive'
   });
   const [showThemePanel, setShowThemePanel] = useState(false);
+  
+  // Sidebar State
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
   // --- STYLE INJECTION FOR REALTIME THEME ---
   useEffect(() => {
@@ -194,7 +196,6 @@ const App: React.FC = () => {
   // State: Blueprint History & Persistence
   const [blueprintHistory, setBlueprintHistory] = useState<NexusBlueprint[]>([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState<number>(-1);
-  const [sidebarView, setSidebarView] = useState<'chat' | 'history'>('chat');
 
   const currentBlueprint = currentHistoryIndex >= 0 && blueprintHistory.length > 0 
     ? blueprintHistory[currentHistoryIndex] 
@@ -205,8 +206,8 @@ const App: React.FC = () => {
     { role: 'nexus', content: 'vickymosafan ONLINE. SIAP MENERIMA INPUT ARSITEKTUR.', timestamp: Date.now() }
   ]);
   
-  // UI Tabs
-  const [activeTab, setActiveTab] = useState<'blueprint' | 'security' | 'code'>('blueprint');
+  // MAIN VIEW STATE
+  const [activeTab, setActiveTab] = useState<'overview' | 'topology' | 'code' | 'console' | 'settings'>('overview');
   const [codeSubTab, setCodeSubTab] = useState<'infrastructure' | 'frontend' | 'backend' | 'database'>('infrastructure');
   
   // Interactions
@@ -214,8 +215,6 @@ const App: React.FC = () => {
   const [techFilter, setTechFilter] = useState<string | null>(null);
   const [showGitModal, setShowGitModal] = useState(false);
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // --- 1. LOCAL STORAGE PERSISTENCE ---
   useEffect(() => {
@@ -231,6 +230,9 @@ const App: React.FC = () => {
       } catch (e) {
         console.error("Core Dump Corrupted:", e);
       }
+    } else {
+        // Default to Console if no data
+        setActiveTab('console');
     }
   }, []);
 
@@ -242,57 +244,19 @@ const App: React.FC = () => {
     }
   }, [blueprintHistory]);
 
-  // Audio Visualizer Loop
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    let animationId: number;
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const bars = 30;
-      const barWidth = canvas.width / bars;
-      for (let i = 0; i < bars; i++) {
-        const height = Math.random() * canvas.height * (loading ? 0.8 : 0.2);
-        const x = i * barWidth;
-        const y = (canvas.height - height) / 2;
-        ctx.fillStyle = loading ? themeConfig.primaryColor : themeConfig.mutedForeground;
-        ctx.fillRect(x + 1, y, barWidth - 2, height);
-      }
-      animationId = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => cancelAnimationFrame(animationId);
-  }, [loading, themeConfig]);
-
   const handleNewProject = () => {
     setCurrentHistoryIndex(-1);
     setMessages([{ role: 'nexus', content: 'Sistem Direset. Memulai Proyek Baru.', timestamp: Date.now() }]);
     setInput('');
     setSelectedNode(null);
-    setSidebarView('chat');
+    setActiveTab('console');
   };
 
   const handleLoadProject = (index: number) => {
     setCurrentHistoryIndex(index);
     setMessages([{ role: 'nexus', content: `Memuat cetak biru: ${blueprintHistory[index].name}`, timestamp: Date.now() }]);
-    setSidebarView('chat');
+    setActiveTab('overview');
     setSelectedNode(null);
-  };
-
-  const handleDeleteProject = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation();
-    const newHistory = [...blueprintHistory];
-    newHistory.splice(index, 1);
-    setBlueprintHistory(newHistory);
-
-    if (index === currentHistoryIndex) {
-        handleNewProject();
-    } else if (index < currentHistoryIndex) {
-        setCurrentHistoryIndex(prev => prev - 1);
-    }
   };
 
   const handleSend = async () => {
@@ -332,8 +296,12 @@ const App: React.FC = () => {
 
       setMessages(prev => {
          const clean = prev.filter(m => !m.content.startsWith("STATUS:"));
-         return [...clean, { role: 'nexus', content: `Analisis Selesai. Cetak biru '${result.name}' telah dibuat dengan ${result.nodes.length} komponen microservices.`, timestamp: Date.now() }];
+         return [...clean, { role: 'nexus', content: `Analisis Selesai. Cetak biru '${result.name}' telah dibuat.`, timestamp: Date.now() }];
       });
+      
+      // Auto switch to overview after generation
+      setActiveTab('overview');
+
     } catch (error) {
       clearInterval(interval);
       setMessages(prev => [...prev, { role: 'nexus', content: 'ERROR: Kegagalan Singularitas. Coba lagi.', timestamp: Date.now() }]);
@@ -348,28 +316,21 @@ const App: React.FC = () => {
     setTimeout(() => setCopiedSection(null), 2000);
   };
 
+  // --- DYNAMIC CODE DISPLAY ---
   const displayedFrontendSpec = useMemo(() => {
     if (!currentBlueprint?.frontendSpec) return '';
     let spec = currentBlueprint.frontendSpec;
 
-    const newConfigBlock = `[THEME_CONFIG]
-Primary Color: ${themeConfig.primaryColor}
-Radius: ${themeConfig.radius}rem
-Style: Default (System)
-Mode: Dual (Light/Dark)
-[/THEME_CONFIG]`;
-    
+    // (CSS replacement logic same as before, abbreviated for clarity)
+    const newConfigBlock = `[THEME_CONFIG]\nPrimary Color: ${themeConfig.primaryColor}\nRadius: ${themeConfig.radius}rem\nStyle: Default\nMode: Dual\n[/THEME_CONFIG]`;
     const configRegex = /\[THEME_CONFIG\][\s\S]*?\[\/THEME_CONFIG\]/g;
-    if (configRegex.test(spec)) {
-      spec = spec.replace(configRegex, newConfigBlock);
-    } else {
-      spec = `${newConfigBlock}\n\n${spec}`;
-    }
-
+    spec = configRegex.test(spec) ? spec.replace(configRegex, newConfigBlock) : `${newConfigBlock}\n\n${spec}`;
+    
     const cssRegex = /\[CSS_VARS\][\s\S]*?\[\/CSS_VARS\]/g;
     const dynamicCss = DEFAULT_CSS_TEMPLATE
       .replace(/{{BACKGROUND}}/g, themeConfig.background || '#09090b')
       .replace(/{{FOREGROUND}}/g, themeConfig.foreground || '#fafafa')
+      // ... (Rest of replacements)
       .replace(/{{CARD}}/g, themeConfig.card || '#09090b')
       .replace(/{{CARD_FOREGROUND}}/g, themeConfig.cardForeground || '#fafafa')
       .replace(/{{POPOVER}}/g, themeConfig.popover || '#09090b')
@@ -402,398 +363,477 @@ Mode: Dual (Light/Dark)
       .replace(/{{SIDEBAR_RING}}/g, themeConfig.sidebarRing || '#a1a1aa')
       .replace(/{{RADIUS}}/g, themeConfig.radius.toString());
 
-    if (cssRegex.test(spec)) {
-      spec = spec.replace(cssRegex, dynamicCss);
-    } else {
-      spec = spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n${dynamicCss}`);
-    }
-
-    return spec;
+    return cssRegex.test(spec) ? spec.replace(cssRegex, dynamicCss) : spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n${dynamicCss}`);
   }, [currentBlueprint, themeConfig]);
 
-  const uniqueTechs = Array.from(new Set(currentBlueprint?.nodes.map(n => n.tech) || []));
+  // --- METRIC CALCS ---
+  const metrics = useMemo(() => {
+     if (!currentBlueprint) return null;
+     const sim = currentBlueprint.simulationData;
+     const avgLoad = Math.round(sim.reduce((a,b) => a + b.load, 0) / sim.length);
+     const avgLatency = Math.round(sim.reduce((a,b) => a + b.latency, 0) / sim.length);
+     const avgErrors = (sim.reduce((a,b) => a + b.errors, 0) / sim.length).toFixed(2);
+     const nodeCount = currentBlueprint.nodes.length;
+     const securityIssues = currentBlueprint.securityReport.length;
+     
+     return { avgLoad, avgLatency, avgErrors, nodeCount, securityIssues };
+  }, [currentBlueprint]);
+
+  // --- VIEWPORT SIMULATION STYLES ---
+  const getViewportStyle = () => {
+    switch(themeConfig.viewport) {
+      case 'sm': return 'w-[640px] h-[90%] rounded-xl border-x border-t border-border shadow-2xl overflow-hidden';
+      case 'md': return 'w-[768px] h-[90%] rounded-xl border-x border-t border-border shadow-2xl overflow-hidden';
+      case 'lg': return 'w-[1024px] h-[90%] rounded-xl border-x border-t border-border shadow-2xl overflow-hidden';
+      case 'xl': return 'w-[1280px] h-[90%] rounded-xl border-x border-t border-border shadow-2xl overflow-hidden';
+      case '2xl': return 'w-[1536px] h-[90%] rounded-xl border-x border-t border-border shadow-2xl overflow-hidden';
+      default: return 'w-full h-full';
+    }
+  };
+
+  const isSimulated = themeConfig.viewport !== 'responsive';
+
+  const NavItem = ({ id, icon: Icon, label, hasBadge = false }: { id: string, icon: any, label: string, hasBadge?: boolean }) => {
+    const isActive = activeTab === id;
+    
+    return (
+      <button 
+        onClick={() => setActiveTab(id as any)}
+        className={`
+          w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative
+          ${isActive 
+            ? 'bg-sidebar-accent text-sidebar-primary-foreground font-medium shadow-sm' 
+            : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}
+        `}
+        title={isSidebarCollapsed ? label : ''}
+      >
+        <div className={`relative flex items-center justify-center ${isSidebarCollapsed ? 'mx-auto' : ''}`}>
+           <Icon size={18} className={`${isActive ? 'text-sidebar-primary' : 'text-muted-foreground group-hover:text-sidebar-foreground'} transition-colors`} />
+           {hasBadge && (
+             <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sidebar-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-sidebar-primary"></span>
+             </span>
+           )}
+        </div>
+        
+        {!isSidebarCollapsed && (
+           <span className="truncate flex-1 text-left text-sm">{label}</span>
+        )}
+        
+        {isActive && !isSidebarCollapsed && (
+          <div className="w-1 h-4 bg-sidebar-primary rounded-full ml-auto"></div>
+        )}
+      </button>
+    );
+  };
 
   return (
-    <div className="flex h-screen w-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30 selection:text-primary">
+    <div className={`flex h-screen w-screen bg-neutral-900 overflow-hidden font-sans selection:bg-primary/30 selection:text-primary justify-center items-end ${isSimulated ? 'pt-10' : ''}`}>
       
       {/* GIT SYNC MODAL */}
       {showGitModal && (
-        <div className="absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="absolute inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card border border-border p-8 rounded-xl w-full max-w-lg shadow-2xl relative overflow-hidden text-card-foreground">
-            <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-            <button onClick={() => setShowGitModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X size={24}/></button>
-            
-            <h2 className="text-2xl font-bold mb-2 flex items-center gap-3 font-mono">
-              <GitBranch className="text-primary" size={28}/> 
-              NEXUS <span className="text-muted-foreground">::</span> GIT SYNC
-            </h2>
-            <p className="text-muted-foreground text-sm mb-6">Push architecture specs to remote repository.</p>
-            
-            <div className="space-y-5">
-              <div className="group">
-                <label className="text-[10px] text-primary font-mono tracking-widest uppercase mb-1 block">Repository URL</label>
-                <div className="flex bg-input border border-border rounded group-focus-within:border-primary transition-colors">
-                   <span className="px-3 py-2 text-muted-foreground bg-muted border-r border-border font-mono text-sm">git@</span>
-                   <input type="text" className="w-full bg-transparent p-2 text-sm text-foreground font-mono focus:outline-none" placeholder="github.com:nexus/project-alpha.git" />
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                 <div className="flex-1">
-                    <label className="text-[10px] text-primary font-mono tracking-widest uppercase mb-1 block">Branch</label>
-                    <input type="text" className="w-full bg-input border border-border rounded p-2 text-sm text-foreground font-mono focus:border-primary focus:outline-none" defaultValue="feat/architecture-update" />
-                 </div>
-                 <div className="flex-1">
-                    <label className="text-[10px] text-primary font-mono tracking-widest uppercase mb-1 block">Commit Hash</label>
-                    <input type="text" className="w-full bg-input border border-border rounded p-2 text-sm text-muted-foreground font-mono cursor-not-allowed" disabled value="a1b2c3d" />
-                 </div>
-              </div>
-
-              <div>
-                 <label className="text-[10px] text-primary font-mono tracking-widest uppercase mb-1 block">Commit Message</label>
-                 <textarea className="w-full bg-input border border-border rounded p-2 text-sm text-emerald-400 font-mono focus:border-emerald-500 focus:outline-none h-20" defaultValue="chore: update architecture blueprint via Nexus Zero" />
-              </div>
-
-              <button 
-                onClick={() => {
-                  setLoading(true);
-                  setTimeout(() => {
-                    setLoading(false);
-                    setShowGitModal(false);
-                    setMessages(prev => [...prev, {role: 'nexus', content: 'GIT SYNC BERHASIL: Artifacts pushed to origin/main.', timestamp: Date.now()}])
-                  }, 1500);
-                }}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded font-bold tracking-widest transition-all flex items-center justify-center gap-2 mt-2"
-              >
-                {loading ? <Activity className="animate-spin"/> : <Save size={18} />}
-                {loading ? 'MENYINKRONKAN...' : 'PUSH CHANGES'}
-              </button>
-            </div>
+             <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+             <button onClick={() => setShowGitModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X size={24}/></button>
+             <h2 className="text-2xl font-bold mb-2 flex items-center gap-3 font-mono"><GitBranch className="text-primary" size={28}/> NEXUS GIT SYNC</h2>
+             <p className="text-muted-foreground text-sm mb-6">Push architecture specs to remote repository.</p>
+             <button onClick={() => { setLoading(true); setTimeout(() => { setLoading(false); setShowGitModal(false); setMessages(prev => [...prev, {role: 'nexus', content: 'GIT SYNC BERHASIL: Artifacts pushed.', timestamp: Date.now()}]) }, 1500); }} className="w-full bg-primary text-primary-foreground py-3 rounded font-bold">PUSH CHANGES</button>
           </div>
         </div>
       )}
 
-      {/* LEFT SIDEBAR */}
-      <div className="w-[360px] border-r border-sidebar-border flex flex-col bg-sidebar text-sidebar-foreground relative z-20 shadow-2xl transition-all duration-300">
-        {/* Header */}
-        <div className="p-5 border-b border-sidebar-border flex flex-col gap-4 bg-sidebar-accent/50">
-            <div className="flex items-center justify-between">
-              <h1 className="font-bold text-lg tracking-wider flex items-center gap-2">
-                <div className="w-3 h-3 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--primary)]"></div>
-                vickymosafan
-              </h1>
-              <div className="flex gap-1">
-                 <button 
-                   onClick={handleNewProject}
-                   className="p-2 rounded hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-primary transition-colors"
-                   title="New Project"
-                 >
-                   <Plus size={16} />
-                 </button>
-                 <button 
-                  onClick={() => setSidebarView(v => v === 'chat' ? 'history' : 'chat')}
-                  className={`p-2 rounded hover:bg-sidebar-accent transition-colors ${sidebarView === 'history' ? 'text-sidebar-primary bg-sidebar-accent' : 'text-sidebar-foreground/50'}`}
-                  title="Archives"
-                 >
-                   {sidebarView === 'history' ? <MessageSquare size={16} /> : <FolderClock size={16} />}
-                 </button>
-                 <button 
-                  onClick={() => setShowThemePanel(!showThemePanel)}
-                  className={`p-2 rounded hover:bg-sidebar-accent transition-colors ${showThemePanel ? 'text-sidebar-primary bg-sidebar-accent' : 'text-sidebar-foreground/50'}`}
-                  title="Theme Settings"
-                >
-                  <Settings size={16} />
-                 </button>
-              </div>
-            </div>
-            <div className="text-[10px] text-sidebar-foreground/50 font-mono flex justify-between">
-               <span>V.4.0.1 // SINGULARITY</span>
-               <span className={loading ? "text-primary animate-pulse" : "text-emerald-500"}>
-                 {loading ? 'PROCESSING...' : 'SYSTEM OPTIMAL'}
-               </span>
-            </div>
-        </div>
+      {/* APP CONTAINER */}
+      <div className={`relative flex bg-background transition-all duration-300 ${getViewportStyle()}`}>
+          
+          {/* MOBILE OVERLAY */}
+          {isMobileMenuOpen && (
+             <div className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
+          )}
 
-        {/* Content Area: Chat or History */}
-        <div className="flex-1 overflow-y-auto relative custom-scrollbar">
-          {sidebarView === 'chat' ? (
-             <div className="p-4 space-y-4 min-h-full pb-20">
-                {messages.map((msg, i) => (
-                  <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                    <div className={`max-w-[90%] p-3 rounded-lg text-sm ${msg.role === 'user' ? 'bg-primary/10 border border-primary/20 text-primary-foreground' : 'bg-muted border border-border text-foreground'}`}>
-                      {msg.role === 'nexus' && <div className="text-[10px] text-primary font-bold mb-1 mb-2 block">vickymosafan AI</div>}
-                      <div className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{msg.content}</div>
-                    </div>
-                    <span className="text-[9px] text-muted-foreground mt-1 font-mono">{new Date(msg.timestamp).toLocaleTimeString()}</span>
-                  </div>
-                ))}
-                {loading && (
-                  <div className="flex items-center gap-2 text-primary text-xs font-mono animate-pulse px-2">
-                      <Activity size={12} /> Thinking...
+          {/* SIDEBAR NAVIGATION (LEFT) */}
+          <div className={`
+            border-r border-sidebar-border flex flex-col bg-sidebar text-sidebar-foreground relative z-50 shadow-xl transition-all duration-300 ease-in-out
+            ${isSidebarCollapsed ? 'w-[72px]' : 'w-[260px]'}
+            fixed md:relative inset-y-0 left-0
+            ${isMobileMenuOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:translate-x-0'}
+          `}>
+             {/* Sidebar Header */}
+             <div className={`h-16 flex items-center border-b border-sidebar-border px-4 ${isSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
+                {!isSidebarCollapsed ? (
+                   <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="w-8 h-8 bg-sidebar-primary rounded-lg flex items-center justify-center text-sidebar-primary-foreground shadow-sm shrink-0">
+                         <Activity size={18} />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                         <h1 className="text-sm font-bold tracking-tight text-sidebar-foreground truncate">vickymosafan</h1>
+                         <div className="text-[10px] text-muted-foreground truncate">Architect AI v4.2</div>
+                      </div>
+                   </div>
+                ) : (
+                  <div className="w-9 h-9 bg-sidebar-primary rounded-lg flex items-center justify-center text-sidebar-primary-foreground shadow-sm">
+                      <Activity size={20} />
                   </div>
                 )}
+                
+                {/* Desktop Toggle Button */}
+                <button 
+                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                  className={`hidden md:flex p-1.5 rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors ${isSidebarCollapsed ? 'absolute -right-3 top-6 bg-sidebar border border-sidebar-border shadow-md rounded-full w-6 h-6 items-center justify-center p-0 z-50' : ''}`}
+                >
+                  {isSidebarCollapsed ? <ChevronRight size={14} /> : <PanelLeftClose size={16} />}
+                </button>
+
+                {/* Mobile Close Button */}
+                <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-muted-foreground">
+                  <X size={20} />
+                </button>
              </div>
-          ) : (
-             <div className="p-2 space-y-2">
-               <h3 className="text-xs font-bold text-muted-foreground px-3 py-2 uppercase tracking-wider">Project Archives</h3>
-               {blueprintHistory.length === 0 ? (
-                 <div className="text-center p-8 text-muted-foreground text-xs">
-                   <Archive size={24} className="mx-auto mb-2 opacity-50"/>
-                   No archives found.
-                 </div>
-               ) : (
-                 blueprintHistory.map((bp, index) => (
-                   <div 
-                     key={index} 
-                     onClick={() => handleLoadProject(index)}
-                     className={`group relative p-3 rounded-lg border cursor-pointer transition-all hover:scale-[1.02] ${index === currentHistoryIndex ? 'bg-sidebar-accent border-sidebar-primary' : 'bg-sidebar-accent/50 border-sidebar-border hover:bg-sidebar-accent'}`}
-                   >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 min-w-0">
-                          <div className={`font-bold text-xs truncate ${index === currentHistoryIndex ? 'text-primary' : 'text-sidebar-foreground'}`}>{bp.name}</div>
-                          <div className="text-[10px] text-muted-foreground font-mono mt-1 truncate">ID: {bp.projectId}</div>
-                          <div className="text-[9px] text-muted-foreground mt-1">{new Date(bp.timestamp || 0).toLocaleString()}</div>
-                        </div>
+
+             {/* Navigation Links */}
+             <div className="flex-1 py-6 px-3 space-y-1 overflow-y-auto custom-scrollbar flex flex-col">
+                
+                <div className="space-y-1">
+                  <NavItem id="overview" icon={LayoutDashboard} label="Overview" />
+                  <NavItem id="topology" icon={Network} label="Topology" />
+                  <NavItem id="code" icon={FileCode} label="Code Specs" />
+                  <NavItem id="console" icon={Command} label="Console AI" hasBadge={true} />
+                </div>
+
+                <div className="my-6 border-t border-sidebar-border/50 mx-2"></div>
+
+                {/* Collapsible History Section */}
+                <div className="space-y-1">
+                   {!isSidebarCollapsed ? (
+                     <>
                         <button 
-                          onClick={(e) => handleDeleteProject(e, index)}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-all absolute top-2 right-2"
-                          title="Delete Project"
+                          onClick={() => setIsProjectsExpanded(!isProjectsExpanded)}
+                          className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider hover:text-sidebar-foreground transition-colors group"
                         >
-                          <Trash2 size={14} />
+                           <span>History</span>
+                           <ChevronDown size={12} className={`transition-transform duration-200 ${isProjectsExpanded ? '' : '-rotate-90'}`} />
                         </button>
+                        
+                        <div className={`space-y-0.5 overflow-hidden transition-all duration-300 ${isProjectsExpanded ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                           {blueprintHistory.map((bp, i) => (
+                              <button 
+                                 key={i} 
+                                 onClick={() => handleLoadProject(i)}
+                                 className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors group ${i === currentHistoryIndex ? 'text-sidebar-foreground bg-sidebar-accent/50' : 'text-muted-foreground hover:bg-sidebar-accent/30 hover:text-sidebar-foreground'}`}
+                              >
+                                 <History size={14} className={i === currentHistoryIndex ? 'text-sidebar-primary' : 'text-muted-foreground'}/>
+                                 <span className="truncate flex-1 text-left">{bp.name}</span>
+                              </button>
+                           ))}
+                           <button onClick={handleNewProject} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-sidebar-primary hover:bg-sidebar-accent/30 rounded-lg transition-colors mt-2">
+                              <Plus size={14} /> 
+                              <span>New Project</span>
+                           </button>
+                        </div>
+                     </>
+                   ) : (
+                     // Collapsed History Icons
+                     <div className="flex flex-col items-center gap-2">
+                        <div className="w-8 h-[1px] bg-sidebar-border mb-2"></div>
+                        <button onClick={handleNewProject} className="p-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-primary transition-colors" title="New Project">
+                           <Plus size={18} />
+                        </button>
+                        {blueprintHistory.length > 0 && (
+                           <button onClick={() => { setIsSidebarCollapsed(false); setIsProjectsExpanded(true); }} className="p-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors" title="View History">
+                              <History size={18} />
+                           </button>
+                        )}
+                     </div>
+                   )}
+                </div>
+
+                <div className="mt-auto pt-6">
+                   <button 
+                      onClick={() => setShowThemePanel(true)}
+                      className={`
+                        w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative
+                        ${showThemePanel 
+                          ? 'bg-sidebar-accent text-sidebar-primary-foreground font-medium shadow-sm' 
+                          : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}
+                      `}
+                      title={isSidebarCollapsed ? "Settings" : ''}
+                   >
+                      <div className={`relative flex items-center justify-center ${isSidebarCollapsed ? 'mx-auto' : ''}`}>
+                         <Settings size={18} className={`${showThemePanel ? 'text-sidebar-primary' : 'text-muted-foreground group-hover:text-sidebar-foreground'} transition-colors`} />
                       </div>
-                      {index === currentHistoryIndex && (
-                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary rounded-l-lg"></div>
+                      
+                      {!isSidebarCollapsed && (
+                         <span className="truncate flex-1 text-left text-sm">Settings</span>
                       )}
-                   </div>
-                 ))
-               )}
+                   </button>
+                </div>
              </div>
-          )}
-        </div>
 
-        {/* Input Area (Only visible in Chat View) */}
-        {sidebarView === 'chat' && (
-          <div className="p-4 border-t border-sidebar-border bg-sidebar-accent/30">
-            <div className="relative">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Describe your architecture..."
-                className="w-full bg-input border border-border rounded-lg p-3 pr-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 min-h-[80px] text-foreground font-mono resize-none placeholder:text-muted-foreground"
-              />
-              <button 
-                onClick={handleSend}
-                disabled={loading || !input.trim()}
-                className="absolute bottom-3 right-3 p-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send size={14} />
-              </button>
-            </div>
-            <div className="mt-2 flex justify-between items-center">
-              <div className="flex gap-2">
-                <button className="text-muted-foreground hover:text-primary transition-colors" title="Voice Input (Coming Soon)">
-                  <Mic size={16} />
-                </button>
-                <button onClick={() => setShowGitModal(true)} className="text-muted-foreground hover:text-primary transition-colors" title="Git Sync">
-                  <GitBranch size={16} />
-                </button>
-              </div>
-              <div className="text-[10px] text-muted-foreground font-mono">
-                  {input.length} chars
-              </div>
-            </div>
+             {/* User Profile */}
+             <div className="p-4 border-t border-sidebar-border">
+                <div className={`flex items-center gap-3 ${isSidebarCollapsed ? 'justify-center' : ''}`}>
+                   <div className="w-9 h-9 rounded-full bg-sidebar-accent border border-sidebar-border flex items-center justify-center shrink-0 relative overflow-hidden group cursor-pointer hover:border-sidebar-primary transition-colors">
+                      <User size={16} className="text-muted-foreground group-hover:text-sidebar-primary transition-colors" />
+                   </div>
+                   
+                   {!isSidebarCollapsed && (
+                     <div className="flex-1 min-w-0 flex items-center justify-between">
+                        <div className="overflow-hidden">
+                           <div className="text-xs font-bold text-sidebar-foreground truncate">Admin User</div>
+                           <div className="text-[10px] text-muted-foreground truncate">admin@vickymosafan.ai</div>
+                        </div>
+                        <button className="text-muted-foreground hover:text-destructive transition-colors">
+                           <LogOut size={14} />
+                        </button>
+                     </div>
+                   )}
+                </div>
+             </div>
           </div>
-        )}
-      </div>
 
-      {/* Main Content (Right) */}
-      <div className="flex-1 flex flex-col relative h-full bg-background">
-         {/* Top Toolbar */}
-         <div className="h-14 border-b border-border bg-card/50 flex items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-               <div className="flex bg-muted rounded p-1 border border-border">
-                  <button 
-                    onClick={() => setActiveTab('blueprint')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'blueprint' ? 'bg-background shadow text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    <Layout size={14} /> BLUEPRINT
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('security')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'security' ? 'bg-background shadow text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    <ShieldAlert size={14} /> SECURITY
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('code')}
-                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'code' ? 'bg-background shadow text-emerald-500' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    <Code size={14} /> CODE GEN
-                  </button>
-               </div>
-               
-               {/* Tech Filter */}
-               {uniqueTechs.length > 0 && (
-                 <div className="flex items-center gap-2 ml-4 px-3 py-1.5 bg-muted rounded border border-border">
-                    <Filter size={12} className="text-muted-foreground" />
-                    <select 
-                      className="bg-transparent text-xs text-foreground focus:outline-none"
-                      onChange={(e) => setTechFilter(e.target.value || null)}
-                      value={techFilter || ''}
-                    >
-                      <option value="">All Technologies</option>
-                      {uniqueTechs.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
+          {/* MAIN CONTENT AREA */}
+          <div className="flex-1 flex flex-col h-full bg-background relative overflow-hidden">
+             
+             {/* Top Header */}
+             <div className="h-16 border-b border-border bg-card/50 flex items-center justify-between px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                 <div className="flex items-center gap-4">
+                     <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden text-muted-foreground hover:text-foreground transition-colors"><Menu size={24}/></button>
+                     <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="hover:text-foreground cursor-pointer font-medium transition-colors">vickymosafan</span>
+                        <ChevronRight size={14} />
+                        <span className="font-semibold text-foreground capitalize">{activeTab}</span>
+                     </nav>
                  </div>
-               )}
-            </div>
-
-            <div className="flex items-center gap-4">
-               {/* Audio Viz Canvas */}
-               <canvas ref={canvasRef} width={100} height={30} className="opacity-50" />
-            </div>
-         </div>
-
-         {/* Workspace */}
-         <div className="flex-1 relative overflow-hidden">
-            {activeTab === 'blueprint' && (
-              <NodeCanvas 
-                blueprint={currentBlueprint} 
-                onNodeSelect={setSelectedNode}
-                techFilter={techFilter}
-              />
-            )}
-
-            {/* Simulation Overlay (Bottom Right) */}
-            {currentBlueprint && activeTab === 'blueprint' && (
-               <div className="absolute bottom-6 right-6 w-80 bg-card/90 border border-border p-4 rounded-xl shadow-2xl backdrop-blur">
-                  <SimulationHub data={currentBlueprint.simulationData} />
-               </div>
-            )}
-            
-            {/* Code View */}
-            {activeTab === 'code' && currentBlueprint && (
-              <div className="absolute inset-0 bg-card flex flex-col">
-                 <div className="flex border-b border-border">
-                    {['infrastructure', 'frontend', 'backend', 'database'].map((sub) => (
-                      <button
-                        key={sub}
-                        onClick={() => setCodeSubTab(sub as any)}
-                        className={`px-4 py-3 text-xs font-mono border-b-2 transition-colors ${codeSubTab === sub ? 'border-primary text-primary bg-muted/50' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-                      >
-                        {sub.toUpperCase()}
-                      </button>
-                    ))}
+                 <div className="flex items-center gap-4">
+                     <div className="relative hidden sm:block group">
+                        <SearchIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"/>
+                        <input type="text" placeholder="Search resources..." className="h-9 w-64 bg-muted/40 border border-border rounded-full pl-9 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-muted-foreground/50"/>
+                     </div>
+                     <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50 rounded-full">
+                        <Bell size={18} />
+                        {currentBlueprint?.securityReport.some(s => s.severity === 'critical') && (
+                           <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border border-background animate-pulse"></span>
+                        )}
+                     </button>
+                     <button onClick={() => setShowGitModal(true)} className="hidden sm:flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow hover:bg-primary/90 transition-all active:scale-95">
+                        <GitBranch size={14} /> <span>Sync</span>
+                     </button>
                  </div>
-                 <div className="flex-1 overflow-auto p-6 font-mono text-sm text-foreground relative group">
-                    <button 
-                      onClick={() => {
-                        const content = codeSubTab === 'frontend' ? displayedFrontendSpec :
-                                      codeSubTab === 'backend' ? currentBlueprint.backendSpec :
-                                      codeSubTab === 'database' ? currentBlueprint.databaseSpec :
-                                      currentBlueprint.godModePrompt;
-                        copyToClipboard(content, codeSubTab);
-                      }}
-                      className="absolute top-4 right-4 p-2 bg-muted rounded hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors z-10"
-                    >
-                       {copiedSection === codeSubTab ? <Check size={16} /> : <Copy size={16} />}
-                    </button>
-                    <pre className="whitespace-pre-wrap max-w-4xl mx-auto">
-                       {codeSubTab === 'frontend' && displayedFrontendSpec}
-                       {codeSubTab === 'backend' && currentBlueprint.backendSpec}
-                       {codeSubTab === 'database' && currentBlueprint.databaseSpec}
-                       {codeSubTab === 'infrastructure' && currentBlueprint.godModePrompt}
-                    </pre>
-                 </div>
-              </div>
-            )}
+             </div>
 
-            {/* Security View */}
-            {activeTab === 'security' && currentBlueprint && (
-               <div className="absolute inset-0 bg-background p-8 overflow-auto">
-                  <div className="max-w-4xl mx-auto space-y-4">
-                     <h2 className="text-xl font-bold text-destructive mb-6 flex items-center gap-2">
-                       <ShieldAlert /> SECURITY AUDIT REPORT
-                     </h2>
-                     {currentBlueprint.securityReport.map(alert => (
-                       <div key={alert.id} className="bg-card border border-border p-4 rounded-lg flex gap-4">
-                          <div className={`w-1 h-full rounded ${alert.severity === 'critical' ? 'bg-destructive' : alert.severity === 'high' ? 'bg-orange-500' : 'bg-yellow-500'}`}></div>
-                          <div>
-                             <div className="flex items-center gap-2 mb-1">
-                                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${alert.severity === 'critical' ? 'bg-destructive/10 text-destructive' : 'bg-orange-950 text-orange-500'}`}>
-                                  {alert.severity}
-                                </span>
-                                <span className="text-sm font-bold text-foreground">{alert.component}</span>
-                             </div>
-                             <p className="text-sm text-muted-foreground mb-2">{alert.issue}</p>
-                             <div className="text-xs bg-muted p-2 rounded border border-border text-emerald-500 font-mono">
-                                FIX: {alert.fix}
-                             </div>
-                          </div>
+             {/* Content Workspace */}
+             <div className="flex-1 overflow-auto custom-scrollbar p-6">
+                
+                {/* OVERVIEW TAB */}
+                {activeTab === 'overview' && (
+                    <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in duration-300">
+                        <div className="flex items-center justify-between">
+                           <div>
+                              <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">Dashboard</h2>
+                              <p className="text-muted-foreground text-sm mt-1">Real-time architecture metrics and system health.</p>
+                           </div>
+                           <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border">
+                              <button className="px-4 py-1.5 text-xs font-medium bg-background shadow-sm rounded-md text-foreground transition-all">Overview</button>
+                              <button className="px-4 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">Analytics</button>
+                              <button className="px-4 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">Reports</button>
+                           </div>
+                        </div>
+
+                        {!currentBlueprint ? (
+                           <div className="text-center py-20 border-2 border-dashed border-border rounded-xl bg-card/30">
+                              <Command size={48} className="mx-auto text-muted-foreground mb-4 opacity-50"/>
+                              <h3 className="text-lg font-bold text-foreground">No Blueprint Active</h3>
+                              <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">Your architecture workspace is empty. Start by generating a new singularity blueprint in the Console.</p>
+                              <button onClick={() => setActiveTab('console')} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-primary/20 transition-all">Launch Console</button>
+                           </div>
+                        ) : (
+                           <>
+                              {/* Metrics Row */}
+                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                 <MetricCard title="Total Nodes" value={metrics?.nodeCount || 0} change="+2" icon={Activity} />
+                                 <MetricCard title="Avg Latency" value={`${metrics?.avgLatency}ms`} change="-12ms" trend="down" icon={Network} />
+                                 <MetricCard title="Error Rate" value={`${metrics?.avgErrors}%`} change="+0.1%" trend="up" icon={ShieldAlert} />
+                                 <MetricCard title="Security Issues" value={metrics?.securityIssues || 0} change="Critical" trend="down" icon={LogOut} />
+                              </div>
+
+                              {/* Charts & Lists */}
+                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                                 {/* Main Chart */}
+                                 <div className="col-span-4 bg-card border border-border rounded-xl shadow-sm p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                       <div>
+                                          <h3 className="text-sm font-bold text-foreground">Simulation Overview</h3>
+                                          <p className="text-[10px] text-muted-foreground">Load vs Latency Correlation</p>
+                                       </div>
+                                       <button className="text-xs text-primary hover:underline">View Details</button>
+                                    </div>
+                                    <div className="h-[300px] w-full">
+                                       <SimulationHub data={currentBlueprint.simulationData} />
+                                    </div>
+                                 </div>
+
+                                 {/* Recent Activity / Security */}
+                                 <div className="col-span-3 bg-card border border-border rounded-xl shadow-sm p-6 flex flex-col">
+                                    <h3 className="text-sm font-bold text-foreground mb-4">Recent Activity</h3>
+                                    <div className="flex-1 overflow-auto pr-2 custom-scrollbar">
+                                       <RecentActivity report={currentBlueprint.securityReport} />
+                                    </div>
+                                 </div>
+                              </div>
+                           </>
+                        )}
+                    </div>
+                )}
+
+                {/* TOPOLOGY TAB */}
+                {activeTab === 'topology' && (
+                    <div className="h-full w-full bg-card border border-border rounded-xl overflow-hidden shadow-sm relative animate-in fade-in zoom-in-95 duration-300">
+                       <div className="absolute top-4 left-4 z-10 flex gap-2">
+                          <select 
+                             className="bg-background/80 border border-border rounded-lg px-3 py-1.5 text-xs focus:outline-none backdrop-blur shadow-sm hover:border-primary/50 transition-colors"
+                             onChange={(e) => setTechFilter(e.target.value || null)}
+                          >
+                             <option value="">All Technologies</option>
+                             {currentBlueprint && Array.from(new Set(currentBlueprint.nodes.map(n => n.tech))).map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
                        </div>
-                     ))}
+                       <NodeCanvas blueprint={currentBlueprint} onNodeSelect={setSelectedNode} techFilter={techFilter} />
+                    </div>
+                )}
+
+                {/* CODE TAB */}
+                {activeTab === 'code' && currentBlueprint && (
+                   <div className="h-full flex flex-col bg-card border border-border rounded-xl shadow-sm overflow-hidden animate-in fade-in duration-300">
+                      <div className="flex border-b border-border bg-muted/30">
+                         {['infrastructure', 'frontend', 'backend', 'database'].map((sub) => (
+                            <button
+                               key={sub}
+                               onClick={() => setCodeSubTab(sub as any)}
+                               className={`px-6 py-3 text-xs font-mono font-bold border-r border-border transition-all uppercase relative overflow-hidden ${codeSubTab === sub ? 'bg-background text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                            >
+                               {codeSubTab === sub && <div className="absolute top-0 left-0 w-full h-0.5 bg-primary"></div>}
+                               {sub}
+                            </button>
+                         ))}
+                         <div className="ml-auto flex items-center px-4">
+                            <button 
+                              onClick={() => {
+                                 const content = codeSubTab === 'frontend' ? displayedFrontendSpec :
+                                       codeSubTab === 'backend' ? currentBlueprint.backendSpec :
+                                       codeSubTab === 'database' ? currentBlueprint.databaseSpec :
+                                       currentBlueprint.godModePrompt;
+                                 copyToClipboard(content, codeSubTab);
+                              }}
+                              className="text-muted-foreground hover:text-primary transition-colors p-2 hover:bg-muted rounded"
+                              title="Copy to Clipboard"
+                            >
+                               {copiedSection === codeSubTab ? <Check size={16}/> : <Copy size={16}/>}
+                            </button>
+                         </div>
+                      </div>
+                      <div className="flex-1 overflow-auto p-6 font-mono text-xs leading-relaxed text-foreground bg-card/50">
+                          <pre className="whitespace-pre-wrap">
+                             {codeSubTab === 'frontend' && displayedFrontendSpec}
+                             {codeSubTab === 'backend' && currentBlueprint.backendSpec}
+                             {codeSubTab === 'database' && currentBlueprint.databaseSpec}
+                             {codeSubTab === 'infrastructure' && currentBlueprint.godModePrompt}
+                          </pre>
+                      </div>
+                   </div>
+                )}
+
+                {/* CONSOLE TAB (CHAT) */}
+                {activeTab === 'console' && (
+                   <div className="h-full flex flex-col max-w-4xl mx-auto animate-in slide-in-from-bottom-4 duration-300 relative">
+                      <div className="flex-1 overflow-y-auto space-y-6 pb-32 p-4 custom-scrollbar">
+                         {messages.map((msg, i) => (
+                            <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'nexus' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                                  {msg.role === 'nexus' ? <Activity size={16} /> : <User size={16} />}
+                               </div>
+                               <div className={`flex flex-col max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                  <div className={`p-4 rounded-2xl text-sm border shadow-sm ${msg.role === 'user' ? 'bg-primary/10 border-primary/20 text-foreground rounded-tr-none' : 'bg-card border-border text-foreground rounded-tl-none'}`}>
+                                     {msg.role === 'nexus' && <span className="text-[10px] font-bold text-primary mb-2 block tracking-wider">NEXUS AI</span>}
+                                     <p className="whitespace-pre-wrap font-mono leading-relaxed">{msg.content}</p>
+                                  </div>
+                                  <span className="text-[10px] text-muted-foreground mt-1 px-1">{new Date(msg.timestamp).toLocaleTimeString()}</span>
+                               </div>
+                            </div>
+                         ))}
+                         {loading && (
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-mono ml-12 p-2 bg-muted/20 rounded-lg w-fit">
+                               <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
+                               <span className="w-2 h-2 bg-primary rounded-full animate-bounce delay-75"></span>
+                               <span className="w-2 h-2 bg-primary rounded-full animate-bounce delay-150"></span>
+                               Processing Architecture...
+                            </div>
+                         )}
+                      </div>
+                      
+                      {/* Input Area */}
+                      <div className="p-4 bg-background/80 backdrop-blur border-t border-border absolute bottom-0 left-0 right-0 z-20">
+                         <div className="relative max-w-4xl mx-auto">
+                            <textarea
+                               value={input}
+                               onChange={(e) => setInput(e.target.value)}
+                               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                               placeholder="Describe your architectural requirements (e.g. 'Microservices for E-Commerce using Go and gRPC')..."
+                               className="w-full bg-card border border-border rounded-xl p-4 pr-14 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none min-h-[60px] resize-none font-mono shadow-lg transition-all"
+                            />
+                            <button 
+                              onClick={handleSend}
+                              disabled={loading || !input.trim()}
+                              className="absolute bottom-3 right-3 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all disabled:opacity-50 hover:scale-105 active:scale-95"
+                            >
+                               <Send size={16} />
+                            </button>
+                         </div>
+                         <div className="flex justify-between mt-2 px-1 max-w-4xl mx-auto">
+                            <div className="flex gap-4 text-[10px] text-muted-foreground font-mono">
+                               <span className="flex items-center gap-1.5 hover:text-foreground cursor-pointer transition-colors"><Mic size={10}/> Voice Inactive</span>
+                               <span className="flex items-center gap-1.5 hover:text-foreground cursor-pointer transition-colors"><Terminal size={10}/> Bash Mode</span>
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">{input.length} chars</span>
+                         </div>
+                      </div>
+                   </div>
+                )}
+             </div>
+
+          </div>
+
+          {/* Theme Editor (Absolute Overlay) */}
+          {showThemePanel && (
+            <div className={`absolute top-0 bottom-0 right-0 w-[320px] bg-card border-l border-border z-[60] shadow-2xl animate-in slide-in-from-right duration-300`}>
+                <button onClick={() => setShowThemePanel(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X size={16}/></button>
+                <ThemeEditor config={themeConfig} onChange={setThemeConfig} />
+            </div>
+          )}
+
+          {/* Node Details (Absolute Overlay) */}
+          {selectedNode && (
+            <div className="absolute right-0 top-0 bottom-0 w-[300px] bg-card/95 backdrop-blur border-l border-border p-6 z-[55] shadow-2xl animate-in slide-in-from-right overflow-y-auto">
+              <button onClick={() => setSelectedNode(null)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X size={20}/></button>
+              <h3 className="text-xl font-bold text-primary mb-1">{selectedNode.label}</h3>
+              <span className="text-xs font-mono bg-muted px-2 py-1 rounded text-muted-foreground">{selectedNode.tech}</span>
+              <div className="mt-6 space-y-4">
+                  <div>
+                    <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Status</label>
+                    <div className={`mt-1 flex items-center gap-2 text-sm font-bold ${selectedNode.status === 'optimal' ? 'text-emerald-500' : selectedNode.status === 'warning' ? 'text-yellow-500' : 'text-destructive'}`}>
+                        <div className={`w-2 h-2 rounded-full ${selectedNode.status === 'optimal' ? 'bg-emerald-500' : selectedNode.status === 'warning' ? 'bg-yellow-500' : 'bg-destructive'}`}></div>
+                        {selectedNode.status.toUpperCase()}
+                    </div>
                   </div>
-               </div>
-            )}
-
-            {!currentBlueprint && !loading && (
-              <div className="absolute inset-0 flex items-center justify-center flex-col text-muted-foreground">
-                <Terminal size={48} className="mb-4 opacity-50"/>
-                <p className="text-lg font-mono">AWAITING ARCHITECTURAL INPUT</p>
-                <p className="text-xs mt-2 max-w-md text-center">
-                  Describe your project idea (e.g., "Netflix clone with microservices"). vickymosafan will generate the entire engineering blueprint.
-                </p>
+                  <div>
+                    <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Analysis</label>
+                    <p className="text-sm text-foreground mt-1 leading-relaxed">{selectedNode.details}</p>
+                  </div>
               </div>
-            )}
-         </div>
+            </div>
+          )}
+
       </div>
-
-      {/* Theme Editor Panel */}
-      {showThemePanel && (
-         <div className="w-[320px] bg-card border-l border-border z-30 shadow-2xl animate-in slide-in-from-right duration-300">
-            <ThemeEditor config={themeConfig} onChange={setThemeConfig} />
-         </div>
-      )}
-
-      {/* Node Details Panel (Right Sidebar when node selected) */}
-      {selectedNode && (
-        <div className="absolute right-0 top-0 bottom-0 w-[300px] bg-card/95 backdrop-blur border-l border-border p-6 z-40 shadow-2xl animate-in slide-in-from-right">
-           <button onClick={() => setSelectedNode(null)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X size={20}/></button>
-           
-           <h3 className="text-xl font-bold text-primary mb-1">{selectedNode.label}</h3>
-           <span className="text-xs font-mono bg-muted px-2 py-1 rounded text-muted-foreground">{selectedNode.tech}</span>
-           
-           <div className="mt-6 space-y-4">
-              <div>
-                 <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Status</label>
-                 <div className={`mt-1 flex items-center gap-2 text-sm font-bold ${selectedNode.status === 'optimal' ? 'text-emerald-500' : selectedNode.status === 'warning' ? 'text-yellow-500' : 'text-destructive'}`}>
-                    <div className={`w-2 h-2 rounded-full ${selectedNode.status === 'optimal' ? 'bg-emerald-500' : selectedNode.status === 'warning' ? 'bg-yellow-500' : 'bg-destructive'}`}></div>
-                    {selectedNode.status.toUpperCase()}
-                 </div>
-              </div>
-              
-              <div>
-                 <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Node ID</label>
-                 <div className="font-mono text-xs text-foreground mt-1">{selectedNode.id}</div>
-              </div>
-              
-              <div>
-                 <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Analysis</label>
-                 <p className="text-sm text-foreground mt-1 leading-relaxed">
-                   {selectedNode.details || "No specific details available for this node."}
-                 </p>
-              </div>
-           </div>
-        </div>
-      )}
-
     </div>
   );
 };

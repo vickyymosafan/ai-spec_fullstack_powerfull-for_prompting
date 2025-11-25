@@ -1,6 +1,8 @@
+
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ThemeConfig } from '../types';
-import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette, Smartphone, Tablet, Monitor, Maximize, Laptop } from 'lucide-react';
 
 interface ThemeEditorProps {
   config: ThemeConfig;
@@ -72,13 +74,14 @@ const PRESETS: { name: string; description: string; config: Partial<ThemeConfig>
         sidebarRing: '#a1a1aa',
         radius: 0.625,
         mode: 'dark',
-        style: 'default'
+        style: 'default',
+        viewport: 'responsive'
     }
   }
 ];
 
 export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) => {
-  const [activeTab, setActiveTab] = useState<'presets' | 'colors' | 'typography' | 'other'>('presets');
+  const [activeTab, setActiveTab] = useState<'presets' | 'colors' | 'typography' | 'other' | 'layout'>('presets');
   const [activeColorField, setActiveColorField] = useState<keyof ThemeConfig | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -246,6 +249,7 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
            { id: 'presets', label: 'Presets' },
            { id: 'colors', label: 'Colors' },
            { id: 'typography', label: 'Typography' },
+           { id: 'layout', label: 'Layout' },
            { id: 'other', label: 'Other' },
          ].map(tab => (
            <button 
@@ -375,6 +379,80 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
                   <h3 className="text-sm font-bold text-foreground mb-1">Typography Engine</h3>
                   <p className="text-xs max-w-[200px]">Font customization is locked in the free version of Nexus Zero.</p>
               </div>
+           </div>
+        )}
+
+        {activeTab === 'layout' && (
+           <div className="p-4 space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+             
+             {/* Viewport Simulator */}
+             <div className="bg-muted/30 border border-border rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-4">
+                   <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                      <LayoutTemplate size={18} />
+                   </div>
+                   <div>
+                      <h4 className="text-xs font-bold text-foreground">Viewport Simulator</h4>
+                      <p className="text-[10px] text-muted-foreground">Real-time Breakpoint Testing</p>
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                   {[
+                     { id: 'sm', icon: Smartphone, label: 'Mobile', width: '640px' },
+                     { id: 'md', icon: Tablet, label: 'Tablet', width: '768px' },
+                     { id: 'lg', icon: Laptop, label: 'Laptop', width: '1024px' },
+                     { id: 'xl', icon: Monitor, label: 'Desktop', width: '1280px' },
+                     { id: '2xl', icon: Monitor, label: 'Wide', width: '1536px' },
+                     { id: 'responsive', icon: Maximize, label: 'Full', width: '100%' },
+                   ].map((vp) => (
+                     <button
+                       key={vp.id}
+                       onClick={() => onChange({ ...config, viewport: vp.id as any })}
+                       className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                         config.viewport === vp.id 
+                           ? 'bg-primary/10 border-primary text-primary' 
+                           : 'bg-background border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+                       }`}
+                     >
+                       <vp.icon size={16} className="mb-2" />
+                       <span className="text-[10px] font-bold">{vp.label}</span>
+                       <span className="text-[9px] opacity-70 font-mono mt-0.5">{vp.width}</span>
+                     </button>
+                   ))}
+                </div>
+             </div>
+
+             {/* Tailwind Info */}
+             <div className="bg-muted/30 border border-border rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-4">
+                   <div className="p-2 bg-muted rounded-lg text-muted-foreground">
+                      <Palette size={18} />
+                   </div>
+                   <div>
+                      <h4 className="text-xs font-bold text-foreground">Breakpoint Reference</h4>
+                      <p className="text-[10px] text-muted-foreground">Tailwind CSS Core Concepts</p>
+                   </div>
+                </div>
+
+                <div className="space-y-1">
+                   {[
+                     { name: 'sm', size: '640px', media: '@media (min-width: 640px)' },
+                     { name: 'md', size: '768px', media: '@media (min-width: 768px)' },
+                     { name: 'lg', size: '1024px', media: '@media (min-width: 1024px)' },
+                     { name: 'xl', size: '1280px', media: '@media (min-width: 1280px)' },
+                     { name: '2xl', size: '1536px', media: '@media (min-width: 1536px)' },
+                   ].map((bp) => (
+                     <div key={bp.name} className="flex items-center justify-between p-2 hover:bg-muted/50 rounded transition-colors border border-transparent hover:border-border/50">
+                        <div className="flex items-center gap-3">
+                           <span className="font-mono text-xs text-primary font-bold w-6">{bp.name}</span>
+                           <span className="text-[10px] text-muted-foreground">{bp.media}</span>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-foreground">{bp.size}</span>
+                     </div>
+                   ))}
+                </div>
+             </div>
            </div>
         )}
 
