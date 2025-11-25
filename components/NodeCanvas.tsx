@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import { NexusBlueprint, NodeType, NodeData } from '../types';
@@ -111,24 +110,24 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
   };
 
   if (!blueprint) return (
-    <div className="w-full h-full flex flex-col items-center justify-center text-cyan-900 font-mono select-none">
+    <div className="w-full h-full flex flex-col items-center justify-center text-primary font-mono select-none">
        <div className="relative w-24 h-24 mb-4">
-          <div className="absolute inset-0 border-4 border-cyan-900/30 rounded-full animate-ping"></div>
-          <div className="absolute inset-2 border-4 border-cyan-800/50 rounded-full animate-spin"></div>
-          <Activity className="absolute inset-0 m-auto text-cyan-700 animate-pulse" size={32} />
+          <div className="absolute inset-0 border-4 border-primary/30 rounded-full animate-ping"></div>
+          <div className="absolute inset-2 border-4 border-primary/50 rounded-full animate-spin"></div>
+          <Activity className="absolute inset-0 m-auto text-primary animate-pulse" size={32} />
        </div>
        <span className="tracking-[0.3em] text-xs animate-pulse">MENUNGGU NEURAL LINK...</span>
     </div>
   );
 
   return (
-    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black select-none cursor-crosshair">
-      <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none"></div>
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-background select-none cursor-crosshair">
+      <div className="absolute inset-0 grid-bg pointer-events-none"></div>
 
       <svg className="w-full h-full absolute inset-0 pointer-events-none z-0">
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#0ea5e9" fillOpacity="0.5" />
+            <polygon points="0 0, 10 3.5, 0 7" fill="var(--primary)" fillOpacity="0.5" />
           </marker>
         </defs>
         <g>
@@ -139,7 +138,7 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
                 y1={link.source.y}
                 x2={link.target.x}
                 y2={link.target.y}
-                stroke="#1e293b"
+                stroke="var(--border)"
                 strokeWidth="2"
               />
               <line
@@ -147,13 +146,13 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
                 y1={link.source.y}
                 x2={link.target.x}
                 y2={link.target.y}
-                stroke="#0ea5e9"
+                stroke="var(--primary)"
                 strokeWidth="1.5"
                 strokeOpacity="0.4"
                 markerEnd="url(#arrowhead)"
                 strokeDasharray="4,4"
               />
-               <circle r="2" fill="#38bdf8">
+               <circle r="2" fill="var(--chart-2)">
                 <animateMotion 
                   dur={`${Math.max(0.5, 3 - (link.latency / 200))}s`} 
                   repeatCount="indefinite"
@@ -168,9 +167,9 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
       {nodes.map((node) => {
         const Icon = getIcon(node.type);
         const statusColors = {
-          critical: 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.4)] bg-red-950/80',
-          warning: 'border-yellow-500/80 shadow-[0_0_20px_rgba(234,179,8,0.4)] bg-yellow-950/80',
-          optimal: 'border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.2)] bg-slate-900/90'
+          critical: 'border-destructive/80 shadow-[0_0_20px_rgba(239,68,68,0.4)] bg-destructive/20',
+          warning: 'border-yellow-500/80 shadow-[0_0_20px_rgba(234,179,8,0.4)] bg-yellow-500/20',
+          optimal: 'border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.2)] bg-card/90'
         };
 
         return (
@@ -180,7 +179,7 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
             onClick={(e) => {
               if(!isDragging) onNodeSelect(node);
             }}
-            className={`absolute flex flex-col items-center justify-center p-3 rounded-xl border backdrop-blur-md transition-all duration-200 cursor-pointer hover:scale-105 z-10 hover:border-white/50 group ${statusColors[node.status]}`}
+            className={`absolute flex flex-col items-center justify-center p-3 rounded-xl border backdrop-blur-md transition-all duration-200 cursor-pointer hover:scale-105 z-10 hover:border-foreground/50 group ${statusColors[node.status]}`}
             style={{ 
               left: node.x, 
               top: node.y, 
@@ -189,19 +188,19 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
             }}
           >
             {/* Connection Node Decorators */}
-            <div className="absolute -left-1 top-1/2 w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
-            <div className="absolute -right-1 top-1/2 w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+            <div className="absolute -left-1 top-1/2 w-1.5 h-1.5 bg-muted-foreground rounded-full"></div>
+            <div className="absolute -right-1 top-1/2 w-1.5 h-1.5 bg-muted-foreground rounded-full"></div>
 
-            <div className={`p-2.5 rounded-full mb-2 bg-black/40 border border-white/10 group-hover:border-white/30 transition-colors`}>
-              <Icon size={20} className={node.status === 'critical' ? 'text-red-400' : 'text-cyan-400'} />
+            <div className={`p-2.5 rounded-full mb-2 bg-background/40 border border-foreground/10 group-hover:border-foreground/30 transition-colors`}>
+              <Icon size={20} className={node.status === 'critical' ? 'text-destructive' : 'text-primary'} />
             </div>
             
-            <div className="text-[11px] font-bold text-slate-100 text-center leading-tight tracking-wide font-mono mb-1">{node.label}</div>
-            <div className="text-[9px] text-slate-400 font-mono px-2 py-0.5 bg-black/30 rounded border border-white/5">{node.tech}</div>
+            <div className="text-[11px] font-bold text-foreground text-center leading-tight tracking-wide font-mono mb-1">{node.label}</div>
+            <div className="text-[9px] text-muted-foreground font-mono px-2 py-0.5 bg-background/30 rounded border border-foreground/5">{node.tech}</div>
             
             {node.status !== 'optimal' && (
-               <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-600 rounded-full border-2 border-slate-900 animate-bounce shadow-lg">
-                 <span className="text-[10px] font-bold text-white">!</span>
+               <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-destructive rounded-full border-2 border-background animate-bounce shadow-lg">
+                 <span className="text-[10px] font-bold text-destructive-foreground">!</span>
                </div>
             )}
           </div>

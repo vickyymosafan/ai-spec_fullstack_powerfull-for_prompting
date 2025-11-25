@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ThemeConfig } from '../types';
-import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette } from 'lucide-react';
 
 interface ThemeEditorProps {
   config: ThemeConfig;
@@ -33,8 +33,52 @@ const TAILWIND_PALETTE: Record<string, Record<string, string>> = {
   Rose: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' },
 };
 
+const PRESETS: { name: string; description: string; config: Partial<ThemeConfig> }[] = [
+  {
+    name: 'Default',
+    description: 'System Default',
+    config: {
+        primaryColor: '#fafafa',
+        primaryForeground: '#18181b',
+        secondaryColor: '#27272a',
+        secondaryForeground: '#fafafa',
+        accentColor: '#3f3f46',
+        accentForeground: '#fafafa',
+        background: '#09090b',
+        foreground: '#fafafa',
+        card: '#09090b',
+        cardForeground: '#fafafa',
+        popover: '#09090b',
+        popoverForeground: '#fafafa',
+        muted: '#27272a',
+        mutedForeground: '#a1a1aa',
+        destructive: '#7f1d1d',
+        destructiveForeground: '#fafafa',
+        border: '#27272a',
+        input: '#27272a',
+        ring: '#a1a1aa',
+        chart1: '#91c5ff',
+        chart2: '#3a81f6',
+        chart3: '#2563ef',
+        chart4: '#1a4eda',
+        chart5: '#1f3fad',
+        sidebar: '#18181b',
+        sidebarForeground: '#fafafa',
+        sidebarPrimary: '#3f3f46',
+        sidebarPrimaryForeground: '#fafafa',
+        sidebarAccent: '#27272a',
+        sidebarAccentForeground: '#fafafa',
+        sidebarBorder: '#27272a',
+        sidebarRing: '#a1a1aa',
+        radius: 0.625,
+        mode: 'dark',
+        style: 'default'
+    }
+  }
+];
+
 export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) => {
-  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'other'>('colors');
+  const [activeTab, setActiveTab] = useState<'presets' | 'colors' | 'typography' | 'other'>('presets');
   const [activeColorField, setActiveColorField] = useState<keyof ThemeConfig | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -127,30 +171,30 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
 
   const ColorRow = ({ label, field, value }: { label: string, field: keyof ThemeConfig, value: string }) => (
     <div className="mb-3 last:mb-0">
-      <label className="text-[11px] font-bold text-zinc-100 mb-1.5 block tracking-wide">{label}</label>
+      <label className="text-[11px] font-bold text-muted-foreground mb-1.5 block tracking-wide">{label}</label>
       <div className="flex items-center gap-2 group">
         <button 
           onClick={() => {
               setActiveColorField(field);
               setSearchQuery('');
           }}
-          className="w-10 h-10 rounded shadow-sm border border-zinc-700 hover:border-zinc-500 transition-all active:scale-95 relative"
+          className="w-10 h-10 rounded shadow-sm border border-border hover:border-foreground/50 transition-all active:scale-95 relative"
           style={{ backgroundColor: value }}
         >
           <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded"></div>
         </button>
-        <div className="flex-1 flex bg-[#121215] border border-zinc-800 rounded overflow-hidden group-focus-within:border-zinc-600 transition-colors">
+        <div className="flex-1 flex bg-input border border-border rounded overflow-hidden group-focus-within:border-primary transition-colors">
             <input 
               type="text" 
               value={value}
               readOnly
-              className="flex-1 bg-transparent px-3 py-2 text-xs font-mono text-zinc-400 focus:outline-none"
+              className="flex-1 bg-transparent px-3 py-2 text-xs font-mono text-foreground focus:outline-none"
               onClick={() => {
                   setActiveColorField(field);
                   setSearchQuery('');
               }}
             />
-            <button className="px-3 border-l border-zinc-800 hover:bg-zinc-800 text-zinc-500 hover:text-zinc-200 transition-colors">
+            <button className="px-3 border-l border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                 <Shuffle size={12}/>
             </button>
         </div>
@@ -165,18 +209,18 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
   }: { 
     id: string, 
     title: string, 
-    children: React.ReactNode 
+    children?: React.ReactNode 
   }) => (
-    <div className="border border-zinc-800 rounded-xl overflow-hidden bg-black/20">
+    <div className="border border-border rounded-xl overflow-hidden bg-card/50">
         <button 
           onClick={() => toggleSection(id)} 
-          className="w-full flex items-center justify-between p-3 bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors border-b border-zinc-800/50"
+          className="w-full flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors border-b border-border/50"
         >
-            <span className="text-xs font-bold text-zinc-200">{title}</span>
-            <ChevronDown size={14} className={`text-zinc-500 transition-transform duration-200 ${openSections[id] ? 'rotate-180' : ''}`} />
+            <span className="text-xs font-bold text-foreground">{title}</span>
+            <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-200 ${openSections[id] ? 'rotate-180' : ''}`} />
         </button>
         {openSections[id] && (
-            <div className="p-4 bg-zinc-950/30 animate-in slide-in-from-top-2 duration-200">
+            <div className="p-4 bg-background/50 animate-in slide-in-from-top-2 duration-200">
                 {children}
             </div>
         )}
@@ -184,21 +228,22 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
   );
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] text-zinc-300 font-sans border-r border-zinc-800 relative">
+    <div className="flex flex-col h-full bg-card text-foreground font-sans border-r border-border relative">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-zinc-800 bg-[#09090b] select-none">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-card select-none">
          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-zinc-100 tracking-tight">Theme Config</span>
+            <span className="text-xs font-bold text-foreground tracking-tight">Theme Config</span>
          </div>
          <div className="flex gap-1">
-           <button className="p-1.5 hover:bg-zinc-800 rounded text-zinc-500 hover:text-white transition-colors"><ArrowLeft size={12}/></button>
-           <button className="p-1.5 hover:bg-zinc-800 rounded text-zinc-500 hover:text-white transition-colors"><ArrowRight size={12}/></button>
+           <button className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"><ArrowLeft size={12}/></button>
+           <button className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"><ArrowRight size={12}/></button>
          </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex px-4 border-b border-zinc-800 bg-[#09090b] gap-4">
+      <div className="flex px-4 border-b border-border bg-card gap-4">
          {[
+           { id: 'presets', label: 'Presets' },
            { id: 'colors', label: 'Colors' },
            { id: 'typography', label: 'Typography' },
            { id: 'other', label: 'Other' },
@@ -207,19 +252,51 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
              key={tab.id}
              onClick={() => setActiveTab(tab.id as any)}
              className={`py-3 text-[11px] font-bold border-b-2 transition-all ${
-               activeTab === tab.id ? 'border-white text-white' : 'border-transparent text-zinc-500 hover:text-zinc-300'
+               activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
              }`}
            >
              {tab.label}
            </button>
          ))}
-         <button className="ml-auto py-3 text-[11px] font-bold text-zinc-500 hover:text-cyan-400 flex items-center gap-1.5 transition-colors">
-           <Wand2 size={10}/> Generate
+         <button className="ml-auto py-3 text-[11px] font-bold text-muted-foreground hover:text-primary flex items-center gap-1.5 transition-colors">
+           <Wand2 size={10}/>
          </button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto custom-scrollbar relative p-4 space-y-2">
+        {activeTab === 'presets' && (
+           <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-right-4 duration-300">
+                {PRESETS.map((preset) => (
+                    <button
+                        key={preset.name}
+                        onClick={() => onChange({ ...config, ...preset.config } as ThemeConfig)}
+                        className="group relative flex items-center gap-4 p-4 bg-muted/30 border border-border hover:border-primary/50 rounded-xl transition-all hover:shadow-xl text-left overflow-hidden"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <div className="flex -space-x-2 relative z-10">
+                            <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-30" style={{ backgroundColor: preset.config.background }}></div>
+                            <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-20" style={{ backgroundColor: preset.config.primaryColor }}></div>
+                            <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-10" style={{ backgroundColor: preset.config.sidebar }}></div>
+                        </div>
+
+                        <div className="relative z-10 flex-1">
+                            <span className="text-xs font-bold text-foreground block">{preset.name}</span>
+                            <span className="text-[10px] text-muted-foreground">{preset.description}</span>
+                        </div>
+
+                        {/* Active Indicator */}
+                        {config.primaryColor === preset.config.primaryColor && config.background === preset.config.background && (
+                            <div className="relative z-10 text-primary bg-primary/10 p-1.5 rounded-full">
+                                <Check size={14} />
+                            </div>
+                        )}
+                    </button>
+                ))}
+           </div>
+        )}
+
         {activeTab === 'colors' && (
             <>
                 <CollapsibleSection id="sidebar" title="Sidebar Colors">
@@ -290,12 +367,12 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
         )}
 
         {activeTab === 'typography' && (
-           <div className="p-10 flex flex-col items-center justify-center h-full text-zinc-600 text-center space-y-4">
-              <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center border border-zinc-800">
+           <div className="p-10 flex flex-col items-center justify-center h-full text-muted-foreground text-center space-y-4">
+              <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center border border-border">
                   <Type size={32} className="opacity-50"/>
               </div>
               <div>
-                  <h3 className="text-sm font-bold text-zinc-400 mb-1">Typography Engine</h3>
+                  <h3 className="text-sm font-bold text-foreground mb-1">Typography Engine</h3>
                   <p className="text-xs max-w-[200px]">Font customization is locked in the free version of Nexus Zero.</p>
               </div>
            </div>
@@ -303,20 +380,20 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
 
         {activeTab === 'other' && (
            <div className="p-1 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 space-y-6">
+             <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-6">
                 <div className="flex items-center justify-between">
-                   <label className="text-xs font-bold text-white flex items-center gap-2">
-                     <Circle size={14} className="text-cyan-500"/> Border Radius
+                   <label className="text-xs font-bold text-foreground flex items-center gap-2">
+                     <Circle size={14} className="text-primary"/> Border Radius
                    </label>
-                   <code className="text-[10px] font-mono text-cyan-400 bg-cyan-950/30 border border-cyan-900/50 px-2 py-1 rounded">
+                   <code className="text-[10px] font-mono text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded">
                        {config.radius}rem
                    </code>
                 </div>
                 
                 <div className="relative h-6 flex items-center">
-                    <div className="absolute w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="absolute w-full h-1 bg-border rounded-full overflow-hidden">
                         <div 
-                            className="h-full bg-gradient-to-r from-cyan-900 to-cyan-500" 
+                            className="h-full bg-primary" 
                             style={{ width: `${(config.radius / 2) * 100}%` }}
                         ></div>
                     </div>
@@ -330,23 +407,23 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
                     className="absolute w-full h-full opacity-0 cursor-pointer"
                     />
                     <div 
-                        className="w-4 h-4 bg-white rounded-full shadow-lg border-2 border-cyan-500 absolute pointer-events-none transition-all"
+                        className="w-4 h-4 bg-background rounded-full shadow-lg border-2 border-primary absolute pointer-events-none transition-all"
                         style={{ left: `calc(${(config.radius / 2) * 100}% - 8px)` }}
                     ></div>
                 </div>
              </div>
 
-             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-1 grid grid-cols-2 gap-1">
+             <div className="bg-muted/30 border border-border rounded-xl p-1 grid grid-cols-2 gap-1">
                  <button 
                     onClick={() => handleModeChange('dark')}
-                    className={`flex flex-col items-center justify-center py-4 rounded-lg transition-all ${config.mode === 'dark' ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-300 border border-transparent'}`}
+                    className={`flex flex-col items-center justify-center py-4 rounded-lg transition-all ${config.mode === 'dark' ? 'bg-background text-foreground shadow-sm border border-border' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'}`}
                  >
                     <Moon size={16} className="mb-2"/>
                     <span className="text-[10px] font-bold">Dark Mode</span>
                  </button>
                  <button 
                     onClick={() => handleModeChange('light')}
-                    className={`flex flex-col items-center justify-center py-4 rounded-lg transition-all ${config.mode === 'light' ? 'bg-zinc-200 text-zinc-900 shadow-sm border border-zinc-300' : 'text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-300 border border-transparent'}`}
+                    className={`flex flex-col items-center justify-center py-4 rounded-lg transition-all ${config.mode === 'light' ? 'bg-background text-foreground shadow-sm border border-border' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'}`}
                  >
                     <Sun size={16} className="mb-2"/>
                     <span className="text-[10px] font-bold">Light Mode</span>
@@ -358,34 +435,34 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
       
       {/* Palette Overlay */}
       {activeColorField && (
-        <div ref={paletteRef} className="absolute inset-x-2 bottom-2 top-20 bg-[#09090b] border border-zinc-700 rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-             <div className="flex items-center gap-2 p-3 border-b border-zinc-800 bg-[#09090b]">
-                <Search size={14} className="text-zinc-500"/>
+        <div ref={paletteRef} className="absolute inset-x-2 bottom-2 top-20 bg-card border border-border rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+             <div className="flex items-center gap-2 p-3 border-b border-border bg-card">
+                <Search size={14} className="text-muted-foreground"/>
                 <input 
                     type="text" 
                     autoFocus
                     placeholder="Search colors..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent text-xs text-white focus:outline-none w-full font-sans placeholder-zinc-600"
+                    className="bg-transparent text-xs text-foreground focus:outline-none w-full font-sans placeholder-muted-foreground"
                 />
-                <button onClick={() => setActiveColorField(null)} className="text-zinc-500 hover:text-white p-1">
+                <button onClick={() => setActiveColorField(null)} className="text-muted-foreground hover:text-foreground p-1">
                     <X size={14}/>
                 </button>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar">
                 {filteredPalette.length === 0 && (
-                    <div className="text-center py-8 text-[10px] text-zinc-600">No matching colors</div>
+                    <div className="text-center py-8 text-[10px] text-muted-foreground">No matching colors</div>
                 )}
                 {filteredPalette.map(([name, shades]) => (
                     <div key={name}>
-                        <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">{name}</div>
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">{name}</div>
                         <div className="grid grid-cols-6 gap-1.5">
                             {Object.entries(shades).map(([weight, hex]) => (
                             <button
                                 key={weight}
                                 onClick={() => handleColorSelect(hex)}
-                                className="group relative w-full aspect-square rounded-[4px] transition-all hover:scale-105 hover:z-10 focus:outline-none ring-offset-zinc-950 focus:ring-2 ring-white/20 border border-transparent hover:border-white/20"
+                                className="group relative w-full aspect-square rounded-[4px] transition-all hover:scale-105 hover:z-10 focus:outline-none ring-offset-background focus:ring-2 ring-foreground/20 border border-transparent hover:border-foreground/20"
                                 style={{ backgroundColor: hex }}
                                 title={`${name}-${weight}`}
                             >
@@ -402,7 +479,7 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
       )}
 
       {/* Footer */}
-      <div className="p-3 border-t border-zinc-800 bg-[#09090b] text-[10px] text-center text-zinc-600 font-mono">
+      <div className="p-3 border-t border-border bg-card text-[10px] text-center text-muted-foreground font-mono">
           vickymosafan VISUAL ENGINE v4.2
       </div>
     </div>

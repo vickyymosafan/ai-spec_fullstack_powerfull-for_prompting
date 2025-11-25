@@ -5,16 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>vickymosafan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              border: "var(--border)",
+              input: "var(--input)",
+              ring: "var(--ring)",
+              background: "var(--background)",
+              foreground: "var(--foreground)",
+              primary: {
+                DEFAULT: "var(--primary)",
+                foreground: "var(--primary-foreground)",
+              },
+              secondary: {
+                DEFAULT: "var(--secondary)",
+                foreground: "var(--secondary-foreground)",
+              },
+              destructive: {
+                DEFAULT: "var(--destructive)",
+                foreground: "var(--destructive-foreground)",
+              },
+              muted: {
+                DEFAULT: "var(--muted)",
+                foreground: "var(--muted-foreground)",
+              },
+              accent: {
+                DEFAULT: "var(--accent)",
+                foreground: "var(--accent-foreground)",
+              },
+              popover: {
+                DEFAULT: "var(--popover)",
+                foreground: "var(--popover-foreground)",
+              },
+              card: {
+                DEFAULT: "var(--card)",
+                foreground: "var(--card-foreground)",
+              },
+              sidebar: {
+                DEFAULT: "var(--sidebar)",
+                foreground: "var(--sidebar-foreground)",
+                primary: "var(--sidebar-primary)",
+                'primary-foreground': "var(--sidebar-primary-foreground)",
+                accent: "var(--sidebar-accent)",
+                'accent-foreground': "var(--sidebar-accent-foreground)",
+                border: "var(--sidebar-border)",
+                ring: "var(--sidebar-ring)",
+              },
+            },
+            borderRadius: {
+              lg: "var(--radius)",
+              md: "calc(var(--radius) - 2px)",
+              sm: "calc(var(--radius) - 4px)",
+            },
+            fontFamily: {
+              sans: "var(--font-sans)",
+              mono: "var(--font-mono)",
+            }
+          },
+        },
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Rajdhani', sans-serif;
-        background-color: #020617; /* slate-950 */
-        color: #e2e8f0;
-        overflow: hidden;
+      :root {
+        --font-sans: 'Rajdhani', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
       }
-      .font-mono {
-        font-family: 'JetBrains Mono', monospace;
+      body {
+        font-family: var(--font-sans);
+        background-color: var(--background);
+        color: var(--foreground);
+        overflow: hidden;
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {
@@ -22,10 +86,10 @@
         height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: var(--muted); 
       }
       ::-webkit-scrollbar-thumb {
-        background: #0ea5e9; 
+        background: var(--primary); 
         border-radius: 3px;
       }
       /* Animations */
@@ -45,9 +109,10 @@
         pointer-events: none;
       }
       .grid-bg {
-        background-image: linear-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(14, 165, 233, 0.1) 1px, transparent 1px);
+        background-image: linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
         background-size: 40px 40px;
+        opacity: 0.2;
       }
     </style>
   <script type="importmap">
