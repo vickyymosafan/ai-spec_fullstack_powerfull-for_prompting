@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { NexusBlueprint, NodeType, ThemeConfig } from "../types";
 
@@ -11,11 +12,38 @@ Misi: Merancang arsitektur perangkat lunak tingkat Enterprise yang sempurna, ama
 
 **ATURAN INTI GENERASI SPESIFIKASI (WAJIB DIPATUHI):**
 
-Tugas Anda adalah menghasilkan JSON yang berisi 3 "God Prompts" terpisah (frontendSpec, backendSpec, databaseSpec). Setiap spec harus ditulis dalam format Markdown yang sangat detail.
+Tugas Anda adalah menghasilkan JSON yang berisi 4 "God Prompts" terpisah (requirementsSpec, frontendSpec, backendSpec, databaseSpec). Setiap spec harus ditulis dalam format Markdown yang sangat detail.
 
 ---
 
-### 1. ATURAN GENERASI: FRONTEND SPEC (frontendSpec)
+### 1. ATURAN GENERASI: REQUIREMENTS SPEC (requirementsSpec)
+Bertindaklah sebagai: **Lead Product Manager & Business Analyst**.
+Tujuan: Menghasilkan Dokumen Persyaratan (PRD) yang komprehensif, tegas, dan dapat diuji.
+
+**Format Output Wajib (Markdown):**
+Dokumen harus mengikuti struktur ketat berikut:
+
+1.  **Pendahuluan**: Ringkasan sistem, tujuan bisnis, dan cakupan.
+2.  **Glosarium**: Definisi istilah teknis/bisnis yang digunakan (Min. 5 istilah).
+3.  **Persyaratan Fungsional (Requirements Loop):**
+    Generate minimal 7-10 persyaratan utama. Setiap persyaratan harus memiliki format:
+    
+    ### Persyaratan X
+    **User Story**: "Sebagai [Role], saya ingin [Action], sehingga [Benefit]."
+    
+    #### Kriteria Penerimaan
+    Gunakan format BDD (Behavior Driven Development) yang ketat (WHEN... THEN... WHILE... IF...).
+    1. WHEN [aksi] THEN [reaksi sistem dengan limitasi waktu/kondisi].
+    2. IF [kondisi error] THEN [handling system].
+    3. WHILE [kondisi berjalan] THEN [performa system].
+    
+    *Contoh Kriteria Penerimaan:*
+    *   "WHEN pengguna menekan tombol checkout THEN Sistem SHALL menampilkan modal pembayaran dalam waktu < 100ms."
+    *   "WHEN koneksi terputus THEN Sistem SHALL menyimpan data ke local storage (Offline Mode)."
+
+---
+
+### 2. ATURAN GENERASI: FRONTEND SPEC (frontendSpec)
 Bertindaklah sebagai: **Senior Frontend Architect & UI/UX Specialist**.
 
 **PENTING: BLOK KONFIGURASI TEMA & CSS**
@@ -305,7 +333,7 @@ Mode: Dual (Light/Dark)
 7.  **Deploy & Vercel:** Instruksi spesifik deployment ke Vercel.
 8.  **Maintainability:** Aturan ESLint, Prettier.
 
-### 2. ATURAN GENERASI: BACKEND SPEC (backendSpec)
+### 3. ATURAN GENERASI: BACKEND SPEC (backendSpec)
 Bertindaklah sebagai: **Principal Backend Engineer**.
 **Arsitektur:** Clean Architecture / Hexagonal Architecture / Domain-Driven Design (DDD).
 **Prinsip Utama:** **END-TO-END TYPE SAFETY** & **CONTRACT-FIRST DEVELOPMENT**.
@@ -385,7 +413,7 @@ Bertindaklah sebagai: **Principal Backend Engineer**.
     *   Unit Test untuk Business Logic.
     *   E2E Test menggunakan Contract untuk mocking.
 
-### 3. ATURAN GENERASI: DATABASE SPEC (databaseSpec)
+### 4. ATURAN GENERASI: DATABASE SPEC (databaseSpec)
 Bertindaklah sebagai: **Database Reliability Engineer (DBRE)**.
 **Prinsip:** Data Integrity, ACID, High Availability.
 **Struktur Konten Harus Mencakup:**
@@ -399,7 +427,7 @@ Bertindaklah sebagai: **Database Reliability Engineer (DBRE)**.
 ---
 
 **FORMAT OUTPUT UTAMA (NexusBlueprint JSON):**
-Pastikan field \`frontendSpec\`, \`backendSpec\`, dan \`databaseSpec\` berisi teks Markdown panjang yang mengikuti struktur di atas dengan bahasa Indonesia yang profesional, tegas, dan instruktif.
+Pastikan field \`requirementsSpec\`, \`frontendSpec\`, \`backendSpec\`, dan \`databaseSpec\` berisi teks Markdown panjang yang mengikuti struktur di atas dengan bahasa Indonesia yang profesional, tegas, dan instruktif.
 `;
 
 export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfig): Promise<NexusBlueprint> => {
@@ -475,11 +503,12 @@ export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfi
         }
       },
       godModePrompt: { type: Type.STRING, description: "Ringkasan Eksekutif Arsitektur & Strategi Cloud Infrastructure (IaC) Terraform/Pulumi." },
+      requirementsSpec: { type: Type.STRING, description: "Dokumen Persyaratan Produk (PRD) lengkap dengan User Story dan Acceptance Criteria (WHEN/THEN)." },
       frontendSpec: { type: Type.STRING, description: "Prompt Markdown detail untuk Frontend Engineer (Style Guide, Vercel, Atomic Design)." },
       backendSpec: { type: Type.STRING, description: "Prompt Markdown detail untuk Backend Engineer (Clean Arch, API Spec, Security)." },
       databaseSpec: { type: Type.STRING, description: "Prompt Markdown detail untuk DBA (Schema, Indexing, Backup)." }
     },
-    required: ['projectId', 'name', 'nodes', 'edges', 'securityReport', 'simulationData', 'godModePrompt', 'frontendSpec', 'backendSpec', 'databaseSpec']
+    required: ['projectId', 'name', 'nodes', 'edges', 'securityReport', 'simulationData', 'godModePrompt', 'requirementsSpec', 'frontendSpec', 'backendSpec', 'databaseSpec']
   };
 
   try {
@@ -489,8 +518,9 @@ export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfi
       ${themeContext}
       
       Hasilkan JSON NexusBlueprint yang valid.
-      Pastikan 'frontendSpec', 'backendSpec', dan 'databaseSpec' SANGAT PANJANG, DETAIL, dan mengikuti struktur 'ATURAN INTI GENERASI SPESIFIKASI' di System Instructions.
+      Pastikan 'requirementsSpec', 'frontendSpec', 'backendSpec', dan 'databaseSpec' SANGAT PANJANG, DETAIL, dan mengikuti struktur 'ATURAN INTI GENERASI SPESIFIKASI' di System Instructions.
       
+      Fokus Requirements: User Story & Acceptance Criteria (Gherkin/BDD Syntax).
       Fokus Frontend: NO GRADIENT, FULL ROUNDED, VERCEL OPTIMIZED. GUNAKAN [CSS_VARS] BLOCK yang sudah disediakan di instruksi.
       Fokus Backend: TYPE-SAFE, CONTRACT-FIRST, TS-REST IMPLEMENTATION (React Query v5 Client), CLEAN ARCHITECTURE.
       Fokus Database: PERFORMANCE, INDEXING.

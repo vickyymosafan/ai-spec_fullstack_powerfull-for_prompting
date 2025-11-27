@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { analyzeArchitecture } from './services/nexusAi';
 import { NexusBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
@@ -208,7 +209,7 @@ const App: React.FC = () => {
   
   // MAIN VIEW STATE
   const [activeTab, setActiveTab] = useState<'overview' | 'topology' | 'code' | 'console' | 'settings'>('overview');
-  const [codeSubTab, setCodeSubTab] = useState<'infrastructure' | 'frontend' | 'backend' | 'database'>('infrastructure');
+  const [codeSubTab, setCodeSubTab] = useState<'infrastructure' | 'requirements' | 'frontend' | 'backend' | 'database'>('infrastructure');
   
   // Interactions
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
@@ -271,6 +272,7 @@ const App: React.FC = () => {
       "Inisialisasi Neural Link...",
       "Analisis Pola Arsitektur...",
       "Simulasi Stress Test 1 Juta User...",
+      "Menyusun Requirements & User Stories...",
       "Validasi Keamanan Zero Trust...",
       "Menyusun Spesifikasi Clean Architecture..."
     ];
@@ -706,7 +708,7 @@ const App: React.FC = () => {
                 {activeTab === 'code' && currentBlueprint && (
                    <div className="h-full flex flex-col bg-card border border-border rounded-xl shadow-sm overflow-hidden animate-in fade-in duration-300">
                       <div className="flex border-b border-border bg-muted/30">
-                         {['infrastructure', 'frontend', 'backend', 'database'].map((sub) => (
+                         {['infrastructure', 'requirements', 'frontend', 'backend', 'database'].map((sub) => (
                             <button
                                key={sub}
                                onClick={() => setCodeSubTab(sub as any)}
@@ -722,6 +724,7 @@ const App: React.FC = () => {
                                  const content = codeSubTab === 'frontend' ? displayedFrontendSpec :
                                        codeSubTab === 'backend' ? currentBlueprint.backendSpec :
                                        codeSubTab === 'database' ? currentBlueprint.databaseSpec :
+                                       codeSubTab === 'requirements' ? currentBlueprint.requirementsSpec :
                                        currentBlueprint.godModePrompt;
                                  copyToClipboard(content, codeSubTab);
                               }}
@@ -734,6 +737,7 @@ const App: React.FC = () => {
                       </div>
                       <div className="flex-1 overflow-auto p-6 font-mono text-xs leading-relaxed text-foreground bg-card/50">
                           <pre className="whitespace-pre-wrap">
+                             {codeSubTab === 'requirements' && (currentBlueprint.requirementsSpec || 'No Requirements Generated.')}
                              {codeSubTab === 'frontend' && displayedFrontendSpec}
                              {codeSubTab === 'backend' && currentBlueprint.backendSpec}
                              {codeSubTab === 'database' && currentBlueprint.databaseSpec}

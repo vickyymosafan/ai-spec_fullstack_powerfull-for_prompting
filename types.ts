@@ -55,6 +55,7 @@ export interface NexusBlueprint {
   // Context & General
   godModePrompt: string; 
   // Specific Domain Specifications
+  requirementsSpec: string; // New: Product Requirements Document (PRD)
   frontendSpec: string;
   backendSpec: string;
   databaseSpec: string;
