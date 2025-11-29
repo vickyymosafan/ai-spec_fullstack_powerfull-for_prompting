@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { SecurityAlert } from '../types';
-import { ShieldAlert, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, AlertTriangle } from 'lucide-react';
 
 interface RecentActivityProps {
   report: SecurityAlert[];

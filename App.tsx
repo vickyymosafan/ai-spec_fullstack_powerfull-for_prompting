@@ -1,6 +1,5 @@
 
-
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { analyzeArchitecture } from './services/nexusAi';
 import { NexusBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
 import { NodeCanvas } from './components/NodeCanvas';
@@ -10,137 +9,20 @@ import { MetricCard } from './components/MetricCard';
 import { RecentActivity } from './components/RecentActivity';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { DEFAULT_DARK_THEME, applyThemeToDocument, generateCssVariables } from './lib/theme';
 import { 
   Mic, Send, ShieldAlert, Terminal, Activity, Code, Save, 
   GitBranch, Filter, X, Copy, Check, Layout, Settings,
-  Plus, FolderClock, MessageSquare, Trash2, Archive, Menu,
-  LayoutDashboard, Network, FileCode, Command, ChevronDown,
+  Plus, Menu, LayoutDashboard, Network, FileCode, Command, ChevronDown,
   Bell, Search as SearchIcon, User, LogOut, ChevronRight,
-  PanelLeftClose, PanelLeft, MoreVertical, History
+  PanelLeftClose
 } from 'lucide-react';
-
-const DEFAULT_CSS_TEMPLATE = `[CSS_VARS]
-:root {
-  --background: {{BACKGROUND}};
-  --foreground: {{FOREGROUND}};
-  --card: {{CARD}};
-  --card-foreground: {{CARD_FOREGROUND}};
-  --popover: {{POPOVER}};
-  --popover-foreground: {{POPOVER_FOREGROUND}};
-  --primary: {{PRIMARY_COLOR}};
-  --primary-foreground: {{PRIMARY_FOREGROUND}};
-  --secondary: {{SECONDARY_COLOR}};
-  --secondary-foreground: {{SECONDARY_FOREGROUND}};
-  --muted: {{MUTED}};
-  --muted-foreground: {{MUTED_FOREGROUND}};
-  --accent: {{ACCENT_COLOR}};
-  --accent-foreground: {{ACCENT_FOREGROUND}};
-  --destructive: {{DESTRUCTIVE}};
-  --destructive-foreground: {{DESTRUCTIVE_FOREGROUND}};
-  --border: {{BORDER}};
-  --input: {{INPUT}};
-  --ring: {{RING}};
-  --chart-1: {{CHART_1}};
-  --chart-2: {{CHART_2}};
-  --chart-3: {{CHART_3}};
-  --chart-4: {{CHART_4}};
-  --chart-5: {{CHART_5}};
-  --sidebar: {{SIDEBAR}};
-  --sidebar-foreground: {{SIDEBAR_FOREGROUND}};
-  --sidebar-primary: {{SIDEBAR_PRIMARY}};
-  --sidebar-primary-foreground: {{SIDEBAR_PRIMARY_FOREGROUND}};
-  --sidebar-accent: {{SIDEBAR_ACCENT}};
-  --sidebar-accent-foreground: {{SIDEBAR_ACCENT_FOREGROUND}};
-  --sidebar-border: {{SIDEBAR_BORDER}};
-  --sidebar-ring: {{SIDEBAR_RING}};
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --radius: {{RADIUS}}rem;
-}
-
-.dark {
-  --background: {{BACKGROUND}};
-  --foreground: {{FOREGROUND}};
-  --card: {{CARD}};
-  --card-foreground: {{CARD_FOREGROUND}};
-  --popover: {{POPOVER}};
-  --popover-foreground: {{POPOVER_FOREGROUND}};
-  --primary: {{PRIMARY_COLOR}};
-  --primary-foreground: {{PRIMARY_FOREGROUND}};
-  --secondary: {{SECONDARY_COLOR}};
-  --secondary-foreground: {{SECONDARY_FOREGROUND}};
-  --muted: {{MUTED}};
-  --muted-foreground: {{MUTED_FOREGROUND}};
-  --accent: {{ACCENT_COLOR}};
-  --accent-foreground: {{ACCENT_FOREGROUND}};
-  --destructive: {{DESTRUCTIVE}};
-  --destructive-foreground: {{DESTRUCTIVE_FOREGROUND}};
-  --border: {{BORDER}};
-  --input: {{INPUT}};
-  --ring: {{RING}};
-  --chart-1: {{CHART_1}};
-  --chart-2: {{CHART_2}};
-  --chart-3: {{CHART_3}};
-  --chart-4: {{CHART_4}};
-  --chart-5: {{CHART_5}};
-  --sidebar: {{SIDEBAR}};
-  --sidebar-foreground: {{SIDEBAR_FOREGROUND}};
-  --sidebar-primary: {{SIDEBAR_PRIMARY}};
-  --sidebar-primary-foreground: {{SIDEBAR_PRIMARY_FOREGROUND}};
-  --sidebar-accent: {{SIDEBAR_ACCENT}};
-  --sidebar-accent-foreground: {{SIDEBAR_ACCENT_FOREGROUND}};
-  --sidebar-border: {{SIDEBAR_BORDER}};
-  --sidebar-ring: {{SIDEBAR_RING}};
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --radius: {{RADIUS}}rem;
-}
-`;
 
 const App: React.FC = () => {
   const [input, setInput] = useState('');
   
   // Theme State
-  const [themeConfig, setThemeConfig] = useState<ThemeConfig>({
-    primaryColor: 'oklch(0.922 0 0)',
-    primaryForeground: 'oklch(0.205 0 0)',
-    secondaryColor: 'oklch(0.269 0 0)',
-    secondaryForeground: 'oklch(0.985 0 0)',
-    accentColor: 'oklch(0.371 0 0)',
-    accentForeground: 'oklch(0.985 0 0)',
-    background: 'oklch(0.145 0 0)',
-    foreground: 'oklch(0.985 0 0)',
-    card: 'oklch(0.205 0 0)',
-    cardForeground: 'oklch(0.985 0 0)',
-    popover: 'oklch(0.269 0 0)',
-    popoverForeground: 'oklch(0.985 0 0)',
-    muted: 'oklch(0.269 0 0)',
-    mutedForeground: 'oklch(0.708 0 0)',
-    destructive: 'oklch(0.704 0.191 22.216)',
-    destructiveForeground: 'oklch(0.985 0 0)',
-    border: 'oklch(0.275 0 0)',
-    input: 'oklch(0.325 0 0)',
-    ring: 'oklch(0.556 0 0)',
-    chart1: 'oklch(0.81 0.10 252)',
-    chart2: 'oklch(0.62 0.19 260)',
-    chart3: 'oklch(0.55 0.22 263)',
-    chart4: 'oklch(0.49 0.22 264)',
-    chart5: 'oklch(0.42 0.18 266)',
-    sidebar: 'oklch(0.205 0 0)',
-    sidebarForeground: 'oklch(0.985 0 0)',
-    sidebarPrimary: 'oklch(0.488 0.243 264.376)',
-    sidebarPrimaryForeground: 'oklch(0.985 0 0)',
-    sidebarAccent: 'oklch(0.269 0 0)',
-    sidebarAccentForeground: 'oklch(0.985 0 0)',
-    sidebarBorder: 'oklch(0.275 0 0)',
-    sidebarRing: 'oklch(0.439 0 0)',
-    radius: 2,
-    mode: 'dark',
-    style: 'default',
-    viewport: 'responsive'
-  });
+  const [themeConfig, setThemeConfig] = useState<ThemeConfig>(DEFAULT_DARK_THEME);
   const [showThemePanel, setShowThemePanel] = useState(false);
   
   // Sidebar State
@@ -150,50 +32,7 @@ const App: React.FC = () => {
 
   // --- STYLE INJECTION FOR REALTIME THEME ---
   useEffect(() => {
-    const root = document.documentElement;
-    const set = (k: string, v?: string) => { if (v) root.style.setProperty(k, v); };
-
-    set('--background', themeConfig.background);
-    set('--foreground', themeConfig.foreground);
-    set('--card', themeConfig.card);
-    set('--card-foreground', themeConfig.cardForeground);
-    set('--popover', themeConfig.popover);
-    set('--popover-foreground', themeConfig.popoverForeground);
-    set('--primary', themeConfig.primaryColor);
-    set('--primary-foreground', themeConfig.primaryForeground);
-    set('--secondary', themeConfig.secondaryColor);
-    set('--secondary-foreground', themeConfig.secondaryForeground);
-    set('--muted', themeConfig.muted);
-    set('--muted-foreground', themeConfig.mutedForeground);
-    set('--accent', themeConfig.accentColor);
-    set('--accent-foreground', themeConfig.accentForeground);
-    set('--destructive', themeConfig.destructive);
-    set('--destructive-foreground', themeConfig.destructiveForeground);
-    set('--border', themeConfig.border);
-    set('--input', themeConfig.input);
-    set('--ring', themeConfig.ring);
-    set('--radius', `${themeConfig.radius}rem`);
-
-    set('--chart-1', themeConfig.chart1);
-    set('--chart-2', themeConfig.chart2);
-    set('--chart-3', themeConfig.chart3);
-    set('--chart-4', themeConfig.chart4);
-    set('--chart-5', themeConfig.chart5);
-
-    set('--sidebar', themeConfig.sidebar);
-    set('--sidebar-foreground', themeConfig.sidebarForeground);
-    set('--sidebar-primary', themeConfig.sidebarPrimary);
-    set('--sidebar-primary-foreground', themeConfig.sidebarPrimaryForeground);
-    set('--sidebar-accent', themeConfig.sidebarAccent);
-    set('--sidebar-accent-foreground', themeConfig.sidebarAccentForeground);
-    set('--sidebar-border', themeConfig.sidebarBorder);
-    set('--sidebar-ring', themeConfig.sidebarRing);
-
-    if (themeConfig.mode === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    applyThemeToDocument(themeConfig);
   }, [themeConfig]);
 
   // State: Blueprint History & Persistence
@@ -325,47 +164,14 @@ const App: React.FC = () => {
     if (!currentBlueprint?.frontendSpec) return '';
     let spec = currentBlueprint.frontendSpec;
 
-    // (CSS replacement logic same as before, abbreviated for clarity)
+    // Inject Theme Config Block
     const newConfigBlock = `[THEME_CONFIG]\nPrimary Color: ${themeConfig.primaryColor}\nRadius: ${themeConfig.radius}rem\nStyle: Default\nMode: Dual\n[/THEME_CONFIG]`;
     const configRegex = /\[THEME_CONFIG\][\s\S]*?\[\/THEME_CONFIG\]/g;
     spec = configRegex.test(spec) ? spec.replace(configRegex, newConfigBlock) : `${newConfigBlock}\n\n${spec}`;
     
+    // Inject CSS Variables using shared utility
+    const dynamicCss = generateCssVariables(themeConfig);
     const cssRegex = /\[CSS_VARS\][\s\S]*?\[\/CSS_VARS\]/g;
-    const dynamicCss = DEFAULT_CSS_TEMPLATE
-      .replace(/{{BACKGROUND}}/g, themeConfig.background || 'oklch(0.145 0 0)')
-      .replace(/{{FOREGROUND}}/g, themeConfig.foreground || 'oklch(0.985 0 0)')
-      // ... (Rest of replacements)
-      .replace(/{{CARD}}/g, themeConfig.card || 'oklch(0.205 0 0)')
-      .replace(/{{CARD_FOREGROUND}}/g, themeConfig.cardForeground || 'oklch(0.985 0 0)')
-      .replace(/{{POPOVER}}/g, themeConfig.popover || 'oklch(0.269 0 0)')
-      .replace(/{{POPOVER_FOREGROUND}}/g, themeConfig.popoverForeground || 'oklch(0.985 0 0)')
-      .replace(/{{PRIMARY_COLOR}}/g, themeConfig.primaryColor)
-      .replace(/{{PRIMARY_FOREGROUND}}/g, themeConfig.primaryForeground || 'oklch(0.205 0 0)')
-      .replace(/{{SECONDARY_COLOR}}/g, themeConfig.secondaryColor || 'oklch(0.269 0 0)')
-      .replace(/{{SECONDARY_FOREGROUND}}/g, themeConfig.secondaryForeground || 'oklch(0.985 0 0)')
-      .replace(/{{MUTED}}/g, themeConfig.muted || 'oklch(0.269 0 0)')
-      .replace(/{{MUTED_FOREGROUND}}/g, themeConfig.mutedForeground || 'oklch(0.708 0 0)')
-      .replace(/{{ACCENT_COLOR}}/g, themeConfig.accentColor || 'oklch(0.371 0 0)')
-      .replace(/{{ACCENT_FOREGROUND}}/g, themeConfig.accentForeground || 'oklch(0.985 0 0)')
-      .replace(/{{DESTRUCTIVE}}/g, themeConfig.destructive || 'oklch(0.704 0.191 22.216)')
-      .replace(/{{DESTRUCTIVE_FOREGROUND}}/g, themeConfig.destructiveForeground || 'oklch(0.985 0 0)')
-      .replace(/{{BORDER}}/g, themeConfig.border || 'oklch(0.275 0 0)')
-      .replace(/{{INPUT}}/g, themeConfig.input || 'oklch(0.325 0 0)')
-      .replace(/{{RING}}/g, themeConfig.ring || 'oklch(0.556 0 0)')
-      .replace(/{{CHART_1}}/g, themeConfig.chart1 || 'oklch(0.81 0.10 252)')
-      .replace(/{{CHART_2}}/g, themeConfig.chart2 || 'oklch(0.62 0.19 260)')
-      .replace(/{{CHART_3}}/g, themeConfig.chart3 || 'oklch(0.55 0.22 263)')
-      .replace(/{{CHART_4}}/g, themeConfig.chart4 || 'oklch(0.49 0.22 264)')
-      .replace(/{{CHART_5}}/g, themeConfig.chart5 || 'oklch(0.42 0.18 266)')
-      .replace(/{{SIDEBAR}}/g, themeConfig.sidebar || 'oklch(0.205 0 0)')
-      .replace(/{{SIDEBAR_FOREGROUND}}/g, themeConfig.sidebarForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SIDEBAR_PRIMARY}}/g, themeConfig.sidebarPrimary || 'oklch(0.488 0.243 264.376)')
-      .replace(/{{SIDEBAR_PRIMARY_FOREGROUND}}/g, themeConfig.sidebarPrimaryForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SIDEBAR_ACCENT}}/g, themeConfig.sidebarAccent || 'oklch(0.269 0 0)')
-      .replace(/{{SIDEBAR_ACCENT_FOREGROUND}}/g, themeConfig.sidebarAccentForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SIDEBAR_BORDER}}/g, themeConfig.sidebarBorder || 'oklch(0.275 0 0)')
-      .replace(/{{SIDEBAR_RING}}/g, themeConfig.sidebarRing || 'oklch(0.439 0 0)')
-      .replace(/{{RADIUS}}/g, themeConfig.radius.toString());
 
     return cssRegex.test(spec) ? spec.replace(cssRegex, dynamicCss) : spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n${dynamicCss}`);
   }, [currentBlueprint, themeConfig]);
@@ -526,7 +332,6 @@ const App: React.FC = () => {
                                  onClick={() => handleLoadProject(i)}
                                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors group ${i === currentHistoryIndex ? 'text-sidebar-foreground bg-sidebar-accent/50' : 'text-muted-foreground hover:bg-sidebar-accent/30 hover:text-sidebar-foreground'}`}
                               >
-                                 <History size={14} className={i === currentHistoryIndex ? 'text-sidebar-primary' : 'text-muted-foreground'}/>
                                  <span className="truncate flex-1 text-left">{bp.name}</span>
                               </button>
                            ))}
@@ -545,7 +350,7 @@ const App: React.FC = () => {
                         </button>
                         {blueprintHistory.length > 0 && (
                            <button onClick={() => { setIsSidebarCollapsed(false); setIsProjectsExpanded(true); }} className="p-2 rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors" title="View History">
-                              <History size={18} />
+                              <span className="text-xs font-bold">...</span>
                            </button>
                         )}
                      </div>
