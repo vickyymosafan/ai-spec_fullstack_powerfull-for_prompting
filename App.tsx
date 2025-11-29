@@ -104,39 +104,39 @@ const App: React.FC = () => {
   
   // Theme State
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>({
-    primaryColor: 'oklch(0.985 0 0)', 
-    primaryForeground: 'oklch(0.21 0.006 285.885)',
-    secondaryColor: 'oklch(0.274 0.006 286.033)',
+    primaryColor: 'oklch(0.922 0 0)',
+    primaryForeground: 'oklch(0.205 0 0)',
+    secondaryColor: 'oklch(0.269 0 0)',
     secondaryForeground: 'oklch(0.985 0 0)',
-    accentColor: 'oklch(0.37 0.013 285.805)',
+    accentColor: 'oklch(0.371 0 0)',
     accentForeground: 'oklch(0.985 0 0)',
-    background: 'oklch(0.141 0.005 285.823)',
+    background: 'oklch(0.145 0 0)',
     foreground: 'oklch(0.985 0 0)',
-    card: 'oklch(0.141 0.005 285.823)',
+    card: 'oklch(0.205 0 0)',
     cardForeground: 'oklch(0.985 0 0)',
-    popover: 'oklch(0.141 0.005 285.823)',
+    popover: 'oklch(0.269 0 0)',
     popoverForeground: 'oklch(0.985 0 0)',
-    muted: 'oklch(0.274 0.006 286.033)',
-    mutedForeground: 'oklch(0.705 0.015 286.067)',
-    destructive: 'oklch(0.379 0.146 25.485)',
+    muted: 'oklch(0.269 0 0)',
+    mutedForeground: 'oklch(0.708 0 0)',
+    destructive: 'oklch(0.704 0.191 22.216)',
     destructiveForeground: 'oklch(0.985 0 0)',
-    border: 'oklch(0.274 0.006 286.033)',
-    input: 'oklch(0.274 0.006 286.033)',
-    ring: 'oklch(0.705 0.015 286.067)',
-    chart1: 'oklch(0.746 0.16 232.661)',
-    chart2: 'oklch(0.623 0.214 259.135)',
-    chart3: 'oklch(0.546 0.245 262.881)',
-    chart4: 'oklch(0.465 0.241 266.755)',
-    chart5: 'oklch(0.391 0.207 266.975)',
-    sidebar: 'oklch(0.21 0.006 285.885)',
+    border: 'oklch(0.275 0 0)',
+    input: 'oklch(0.325 0 0)',
+    ring: 'oklch(0.556 0 0)',
+    chart1: 'oklch(0.81 0.10 252)',
+    chart2: 'oklch(0.62 0.19 260)',
+    chart3: 'oklch(0.55 0.22 263)',
+    chart4: 'oklch(0.49 0.22 264)',
+    chart5: 'oklch(0.42 0.18 266)',
+    sidebar: 'oklch(0.205 0 0)',
     sidebarForeground: 'oklch(0.985 0 0)',
-    sidebarPrimary: 'oklch(0.37 0.013 285.805)',
+    sidebarPrimary: 'oklch(0.488 0.243 264.376)',
     sidebarPrimaryForeground: 'oklch(0.985 0 0)',
-    sidebarAccent: 'oklch(0.274 0.006 286.033)',
+    sidebarAccent: 'oklch(0.269 0 0)',
     sidebarAccentForeground: 'oklch(0.985 0 0)',
-    sidebarBorder: 'oklch(0.274 0.006 286.033)',
-    sidebarRing: 'oklch(0.705 0.015 286.067)',
-    radius: 0.625,
+    sidebarBorder: 'oklch(0.275 0 0)',
+    sidebarRing: 'oklch(0.439 0 0)',
+    radius: 2,
     mode: 'dark',
     style: 'default',
     viewport: 'responsive'
@@ -332,39 +332,39 @@ const App: React.FC = () => {
     
     const cssRegex = /\[CSS_VARS\][\s\S]*?\[\/CSS_VARS\]/g;
     const dynamicCss = DEFAULT_CSS_TEMPLATE
-      .replace(/{{BACKGROUND}}/g, themeConfig.background || 'oklch(0.141 0.005 285.823)')
+      .replace(/{{BACKGROUND}}/g, themeConfig.background || 'oklch(0.145 0 0)')
       .replace(/{{FOREGROUND}}/g, themeConfig.foreground || 'oklch(0.985 0 0)')
       // ... (Rest of replacements)
-      .replace(/{{CARD}}/g, themeConfig.card || 'oklch(0.141 0.005 285.823)')
+      .replace(/{{CARD}}/g, themeConfig.card || 'oklch(0.205 0 0)')
       .replace(/{{CARD_FOREGROUND}}/g, themeConfig.cardForeground || 'oklch(0.985 0 0)')
-      .replace(/{{POPOVER}}/g, themeConfig.popover || 'oklch(0.141 0.005 285.823)')
+      .replace(/{{POPOVER}}/g, themeConfig.popover || 'oklch(0.269 0 0)')
       .replace(/{{POPOVER_FOREGROUND}}/g, themeConfig.popoverForeground || 'oklch(0.985 0 0)')
       .replace(/{{PRIMARY_COLOR}}/g, themeConfig.primaryColor)
-      .replace(/{{PRIMARY_FOREGROUND}}/g, themeConfig.primaryForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SECONDARY_COLOR}}/g, themeConfig.secondaryColor || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{PRIMARY_FOREGROUND}}/g, themeConfig.primaryForeground || 'oklch(0.205 0 0)')
+      .replace(/{{SECONDARY_COLOR}}/g, themeConfig.secondaryColor || 'oklch(0.269 0 0)')
       .replace(/{{SECONDARY_FOREGROUND}}/g, themeConfig.secondaryForeground || 'oklch(0.985 0 0)')
-      .replace(/{{MUTED}}/g, themeConfig.muted || 'oklch(0.274 0.006 286.033)')
-      .replace(/{{MUTED_FOREGROUND}}/g, themeConfig.mutedForeground || 'oklch(0.705 0.015 286.067)')
-      .replace(/{{ACCENT_COLOR}}/g, themeConfig.accentColor || 'oklch(0.37 0.013 285.805)')
+      .replace(/{{MUTED}}/g, themeConfig.muted || 'oklch(0.269 0 0)')
+      .replace(/{{MUTED_FOREGROUND}}/g, themeConfig.mutedForeground || 'oklch(0.708 0 0)')
+      .replace(/{{ACCENT_COLOR}}/g, themeConfig.accentColor || 'oklch(0.371 0 0)')
       .replace(/{{ACCENT_FOREGROUND}}/g, themeConfig.accentForeground || 'oklch(0.985 0 0)')
-      .replace(/{{DESTRUCTIVE}}/g, themeConfig.destructive || 'oklch(0.379 0.146 25.485)')
+      .replace(/{{DESTRUCTIVE}}/g, themeConfig.destructive || 'oklch(0.704 0.191 22.216)')
       .replace(/{{DESTRUCTIVE_FOREGROUND}}/g, themeConfig.destructiveForeground || 'oklch(0.985 0 0)')
-      .replace(/{{BORDER}}/g, themeConfig.border || 'oklch(0.274 0.006 286.033)')
-      .replace(/{{INPUT}}/g, themeConfig.input || 'oklch(0.274 0.006 286.033)')
-      .replace(/{{RING}}/g, themeConfig.ring || 'oklch(0.705 0.015 286.067)')
-      .replace(/{{CHART_1}}/g, themeConfig.chart1 || 'oklch(0.746 0.16 232.661)')
-      .replace(/{{CHART_2}}/g, themeConfig.chart2 || 'oklch(0.623 0.214 259.135)')
-      .replace(/{{CHART_3}}/g, themeConfig.chart3 || 'oklch(0.546 0.245 262.881)')
-      .replace(/{{CHART_4}}/g, themeConfig.chart4 || 'oklch(0.465 0.241 266.755)')
-      .replace(/{{CHART_5}}/g, themeConfig.chart5 || 'oklch(0.391 0.207 266.975)')
-      .replace(/{{SIDEBAR}}/g, themeConfig.sidebar || 'oklch(0.21 0.006 285.885)')
+      .replace(/{{BORDER}}/g, themeConfig.border || 'oklch(0.275 0 0)')
+      .replace(/{{INPUT}}/g, themeConfig.input || 'oklch(0.325 0 0)')
+      .replace(/{{RING}}/g, themeConfig.ring || 'oklch(0.556 0 0)')
+      .replace(/{{CHART_1}}/g, themeConfig.chart1 || 'oklch(0.81 0.10 252)')
+      .replace(/{{CHART_2}}/g, themeConfig.chart2 || 'oklch(0.62 0.19 260)')
+      .replace(/{{CHART_3}}/g, themeConfig.chart3 || 'oklch(0.55 0.22 263)')
+      .replace(/{{CHART_4}}/g, themeConfig.chart4 || 'oklch(0.49 0.22 264)')
+      .replace(/{{CHART_5}}/g, themeConfig.chart5 || 'oklch(0.42 0.18 266)')
+      .replace(/{{SIDEBAR}}/g, themeConfig.sidebar || 'oklch(0.205 0 0)')
       .replace(/{{SIDEBAR_FOREGROUND}}/g, themeConfig.sidebarForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SIDEBAR_PRIMARY}}/g, themeConfig.sidebarPrimary || 'oklch(0.37 0.013 285.805)')
+      .replace(/{{SIDEBAR_PRIMARY}}/g, themeConfig.sidebarPrimary || 'oklch(0.488 0.243 264.376)')
       .replace(/{{SIDEBAR_PRIMARY_FOREGROUND}}/g, themeConfig.sidebarPrimaryForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SIDEBAR_ACCENT}}/g, themeConfig.sidebarAccent || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{SIDEBAR_ACCENT}}/g, themeConfig.sidebarAccent || 'oklch(0.269 0 0)')
       .replace(/{{SIDEBAR_ACCENT_FOREGROUND}}/g, themeConfig.sidebarAccentForeground || 'oklch(0.985 0 0)')
-      .replace(/{{SIDEBAR_BORDER}}/g, themeConfig.sidebarBorder || 'oklch(0.274 0.006 286.033)')
-      .replace(/{{SIDEBAR_RING}}/g, themeConfig.sidebarRing || 'oklch(0.705 0.015 286.067)')
+      .replace(/{{SIDEBAR_BORDER}}/g, themeConfig.sidebarBorder || 'oklch(0.275 0 0)')
+      .replace(/{{SIDEBAR_RING}}/g, themeConfig.sidebarRing || 'oklch(0.439 0 0)')
       .replace(/{{RADIUS}}/g, themeConfig.radius.toString());
 
     return cssRegex.test(spec) ? spec.replace(cssRegex, dynamicCss) : spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n${dynamicCss}`);

@@ -150,39 +150,39 @@ const PRESETS: { name: string; description: string; config: Partial<ThemeConfig>
     name: 'Default',
     description: 'System Default (OKLCH)',
     config: {
-        primaryColor: 'oklch(0.985 0 0)', // Zinc 50
-        primaryForeground: 'oklch(0.21 0.006 285.885)', // Zinc 900
-        secondaryColor: 'oklch(0.274 0.006 286.033)', // Zinc 800
+        primaryColor: 'oklch(0.922 0 0)',
+        primaryForeground: 'oklch(0.205 0 0)',
+        secondaryColor: 'oklch(0.269 0 0)',
         secondaryForeground: 'oklch(0.985 0 0)',
-        accentColor: 'oklch(0.37 0.013 285.805)', // Zinc 700
+        accentColor: 'oklch(0.371 0 0)',
         accentForeground: 'oklch(0.985 0 0)',
-        background: 'oklch(0.141 0.005 285.823)', // Zinc 950
-        foreground: 'oklch(0.985 0 0)', // Zinc 50
-        card: 'oklch(0.141 0.005 285.823)',
+        background: 'oklch(0.145 0 0)',
+        foreground: 'oklch(0.985 0 0)',
+        card: 'oklch(0.205 0 0)',
         cardForeground: 'oklch(0.985 0 0)',
-        popover: 'oklch(0.141 0.005 285.823)',
+        popover: 'oklch(0.269 0 0)',
         popoverForeground: 'oklch(0.985 0 0)',
-        muted: 'oklch(0.274 0.006 286.033)',
-        mutedForeground: 'oklch(0.705 0.015 286.067)', // Zinc 400
-        destructive: 'oklch(0.379 0.146 25.485)', // Red 900
+        muted: 'oklch(0.269 0 0)',
+        mutedForeground: 'oklch(0.708 0 0)',
+        destructive: 'oklch(0.704 0.191 22.216)',
         destructiveForeground: 'oklch(0.985 0 0)',
-        border: 'oklch(0.274 0.006 286.033)', // Zinc 800
-        input: 'oklch(0.274 0.006 286.033)',
-        ring: 'oklch(0.705 0.015 286.067)',
-        chart1: 'oklch(0.746 0.16 232.661)', // Sky 400
-        chart2: 'oklch(0.623 0.214 259.135)', // Blue 500
-        chart3: 'oklch(0.546 0.245 262.881)', // Blue 600
-        chart4: 'oklch(0.465 0.241 266.755)', // Blue 700
-        chart5: 'oklch(0.391 0.207 266.975)', // Blue 800
-        sidebar: 'oklch(0.21 0.006 285.885)', // Zinc 900
+        border: 'oklch(0.275 0 0)',
+        input: 'oklch(0.325 0 0)',
+        ring: 'oklch(0.556 0 0)',
+        chart1: 'oklch(0.81 0.10 252)',
+        chart2: 'oklch(0.62 0.19 260)',
+        chart3: 'oklch(0.55 0.22 263)',
+        chart4: 'oklch(0.49 0.22 264)',
+        chart5: 'oklch(0.42 0.18 266)',
+        sidebar: 'oklch(0.205 0 0)',
         sidebarForeground: 'oklch(0.985 0 0)',
-        sidebarPrimary: 'oklch(0.37 0.013 285.805)', // Zinc 700
+        sidebarPrimary: 'oklch(0.488 0.243 264.376)',
         sidebarPrimaryForeground: 'oklch(0.985 0 0)',
-        sidebarAccent: 'oklch(0.274 0.006 286.033)', // Zinc 800
+        sidebarAccent: 'oklch(0.269 0 0)',
         sidebarAccentForeground: 'oklch(0.985 0 0)',
-        sidebarBorder: 'oklch(0.274 0.006 286.033)',
-        sidebarRing: 'oklch(0.705 0.015 286.067)',
-        radius: 0.625,
+        sidebarBorder: 'oklch(0.275 0 0)',
+        sidebarRing: 'oklch(0.439 0 0)',
+        radius: 2,
         mode: 'dark',
         style: 'default',
         viewport: 'responsive'
@@ -240,42 +240,42 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
         ...config,
         mode: mode,
         // Base
-        background: isDark ? 'oklch(0.141 0.005 285.823)' : 'oklch(1 0 0)',
-        foreground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.141 0.005 285.823)',
+        background: isDark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)',
+        foreground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)',
         // Card
-        card: isDark ? 'oklch(0.141 0.005 285.823)' : 'oklch(1 0 0)',
-        cardForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.141 0.005 285.823)',
+        card: isDark ? 'oklch(0.205 0 0)' : 'oklch(1 0 0)',
+        cardForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)',
         // Popover
-        popover: isDark ? 'oklch(0.141 0.005 285.823)' : 'oklch(1 0 0)',
-        popoverForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.141 0.005 285.823)',
+        popover: isDark ? 'oklch(0.269 0 0)' : 'oklch(1 0 0)',
+        popoverForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)',
         // Primary
-        primaryColor: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
-        primaryForeground: isDark ? 'oklch(0.21 0.006 285.885)' : 'oklch(0.985 0 0)',
+        primaryColor: isDark ? 'oklch(0.922 0 0)' : 'oklch(0.205 0 0)',
+        primaryForeground: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.985 0 0)',
         // Secondary
-        secondaryColor: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.967 0.001 286.375)',
-        secondaryForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
+        secondaryColor: isDark ? 'oklch(0.269 0 0)' : 'oklch(0.97 0 0)',
+        secondaryForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.205 0 0)',
         // Muted
-        muted: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.967 0.001 286.375)',
-        mutedForeground: isDark ? 'oklch(0.705 0.015 286.067)' : 'oklch(0.552 0.016 285.938)',
+        muted: isDark ? 'oklch(0.269 0 0)' : 'oklch(0.97 0 0)',
+        mutedForeground: isDark ? 'oklch(0.708 0 0)' : 'oklch(0.556 0 0)',
         // Accent
-        accentColor: isDark ? 'oklch(0.37 0.013 285.805)' : 'oklch(0.967 0.001 286.375)',
-        accentForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
+        accentColor: isDark ? 'oklch(0.371 0 0)' : 'oklch(0.97 0 0)',
+        accentForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.205 0 0)',
         // Destructive
-        destructive: isDark ? 'oklch(0.379 0.146 25.485)' : 'oklch(0.637 0.237 25.331)',
+        destructive: isDark ? 'oklch(0.704 0.191 22.216)' : 'oklch(0.637 0.237 25.331)',
         destructiveForeground: 'oklch(0.985 0 0)', 
         // Border/Input
-        border: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
-        input: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
-        ring: isDark ? 'oklch(0.705 0.015 286.067)' : 'oklch(0.552 0.016 285.938)',
+        border: isDark ? 'oklch(0.275 0 0)' : 'oklch(0.922 0 0)',
+        input: isDark ? 'oklch(0.325 0 0)' : 'oklch(0.922 0 0)',
+        ring: isDark ? 'oklch(0.556 0 0)' : 'oklch(0.556 0 0)',
         // Sidebar
-        sidebar: isDark ? 'oklch(0.21 0.006 285.885)' : 'oklch(0.967 0.001 286.375)',
-        sidebarForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
-        sidebarPrimary: isDark ? 'oklch(0.37 0.013 285.805)' : 'oklch(0.21 0.006 285.885)',
+        sidebar: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.97 0 0)',
+        sidebarForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.205 0 0)',
+        sidebarPrimary: isDark ? 'oklch(0.488 0.243 264.376)' : 'oklch(0.205 0 0)',
         sidebarPrimaryForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.985 0 0)',
-        sidebarAccent: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
-        sidebarAccentForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
-        sidebarBorder: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
-        sidebarRing: isDark ? 'oklch(0.705 0.015 286.067)' : 'oklch(0.705 0.015 286.067)',
+        sidebarAccent: isDark ? 'oklch(0.269 0 0)' : 'oklch(0.922 0 0)',
+        sidebarAccentForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.205 0 0)',
+        sidebarBorder: isDark ? 'oklch(0.275 0 0)' : 'oklch(0.922 0 0)',
+        sidebarRing: isDark ? 'oklch(0.439 0 0)' : 'oklch(0.705 0.015 286.067)',
     });
   };
 
@@ -415,67 +415,67 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
         {activeTab === 'colors' && (
             <>
                 <CollapsibleSection id="sidebar" title="Sidebar Colors">
-                    <ColorRow label="Sidebar Background" field="sidebar" value={config.sidebar || 'oklch(0.21 0.006 285.885)'} />
+                    <ColorRow label="Sidebar Background" field="sidebar" value={config.sidebar || 'oklch(0.205 0 0)'} />
                     <ColorRow label="Sidebar Foreground" field="sidebarForeground" value={config.sidebarForeground || 'oklch(0.985 0 0)'} />
-                    <ColorRow label="Sidebar Primary" field="sidebarPrimary" value={config.sidebarPrimary || 'oklch(0.37 0.013 285.805)'} />
+                    <ColorRow label="Sidebar Primary" field="sidebarPrimary" value={config.sidebarPrimary || 'oklch(0.488 0.243 264.376)'} />
                     <ColorRow label="Sidebar Primary Foreground" field="sidebarPrimaryForeground" value={config.sidebarPrimaryForeground || 'oklch(0.985 0 0)'} />
-                    <ColorRow label="Sidebar Accent" field="sidebarAccent" value={config.sidebarAccent || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Sidebar Accent" field="sidebarAccent" value={config.sidebarAccent || 'oklch(0.269 0 0)'} />
                     <ColorRow label="Sidebar Accent Foreground" field="sidebarAccentForeground" value={config.sidebarAccentForeground || 'oklch(0.985 0 0)'} />
-                    <ColorRow label="Sidebar Border" field="sidebarBorder" value={config.sidebarBorder || 'oklch(0.274 0.006 286.033)'} />
-                    <ColorRow label="Sidebar Ring" field="sidebarRing" value={config.sidebarRing || 'oklch(0.705 0.015 286.067)'} />
+                    <ColorRow label="Sidebar Border" field="sidebarBorder" value={config.sidebarBorder || 'oklch(0.275 0 0)'} />
+                    <ColorRow label="Sidebar Ring" field="sidebarRing" value={config.sidebarRing || 'oklch(0.439 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="charts" title="Chart Colors">
-                    <ColorRow label="Chart 1" field="chart1" value={config.chart1 || 'oklch(0.746 0.16 232.661)'} />
-                    <ColorRow label="Chart 2" field="chart2" value={config.chart2 || 'oklch(0.623 0.214 259.135)'} />
-                    <ColorRow label="Chart 3" field="chart3" value={config.chart3 || 'oklch(0.546 0.245 262.881)'} />
-                    <ColorRow label="Chart 4" field="chart4" value={config.chart4 || 'oklch(0.465 0.241 266.755)'} />
-                    <ColorRow label="Chart 5" field="chart5" value={config.chart5 || 'oklch(0.391 0.207 266.975)'} />
+                    <ColorRow label="Chart 1" field="chart1" value={config.chart1 || 'oklch(0.81 0.10 252)'} />
+                    <ColorRow label="Chart 2" field="chart2" value={config.chart2 || 'oklch(0.62 0.19 260)'} />
+                    <ColorRow label="Chart 3" field="chart3" value={config.chart3 || 'oklch(0.55 0.22 263)'} />
+                    <ColorRow label="Chart 4" field="chart4" value={config.chart4 || 'oklch(0.49 0.22 264)'} />
+                    <ColorRow label="Chart 5" field="chart5" value={config.chart5 || 'oklch(0.42 0.18 266)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="base" title="Base Colors">
-                    <ColorRow label="Background" field="background" value={config.background || 'oklch(0.141 0.005 285.823)'} />
+                    <ColorRow label="Background" field="background" value={config.background || 'oklch(0.145 0 0)'} />
                     <ColorRow label="Foreground" field="foreground" value={config.foreground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="card" title="Card Colors">
-                    <ColorRow label="Card Background" field="card" value={config.card || 'oklch(0.141 0.005 285.823)'} />
+                    <ColorRow label="Card Background" field="card" value={config.card || 'oklch(0.205 0 0)'} />
                     <ColorRow label="Card Foreground" field="cardForeground" value={config.cardForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="popover" title="Popover Colors">
-                    <ColorRow label="Popover Background" field="popover" value={config.popover || 'oklch(0.141 0.005 285.823)'} />
+                    <ColorRow label="Popover Background" field="popover" value={config.popover || 'oklch(0.269 0 0)'} />
                     <ColorRow label="Popover Foreground" field="popoverForeground" value={config.popoverForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="muted" title="Muted Colors">
-                    <ColorRow label="Muted" field="muted" value={config.muted || 'oklch(0.274 0.006 286.033)'} />
-                    <ColorRow label="Muted Foreground" field="mutedForeground" value={config.mutedForeground || 'oklch(0.705 0.015 286.067)'} />
+                    <ColorRow label="Muted" field="muted" value={config.muted || 'oklch(0.269 0 0)'} />
+                    <ColorRow label="Muted Foreground" field="mutedForeground" value={config.mutedForeground || 'oklch(0.708 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="destructive" title="Destructive Colors">
-                    <ColorRow label="Destructive" field="destructive" value={config.destructive || 'oklch(0.379 0.146 25.485)'} />
+                    <ColorRow label="Destructive" field="destructive" value={config.destructive || 'oklch(0.704 0.191 22.216)'} />
                     <ColorRow label="Destructive Foreground" field="destructiveForeground" value={config.destructiveForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="borderInput" title="Border & Input Colors">
-                    <ColorRow label="Border" field="border" value={config.border || 'oklch(0.274 0.006 286.033)'} />
-                    <ColorRow label="Input" field="input" value={config.input || 'oklch(0.274 0.006 286.033)'} />
-                    <ColorRow label="Ring" field="ring" value={config.ring || 'oklch(0.705 0.015 286.067)'} />
+                    <ColorRow label="Border" field="border" value={config.border || 'oklch(0.275 0 0)'} />
+                    <ColorRow label="Input" field="input" value={config.input || 'oklch(0.325 0 0)'} />
+                    <ColorRow label="Ring" field="ring" value={config.ring || 'oklch(0.556 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="primary" title="Primary Colors">
                     <ColorRow label="Primary" field="primaryColor" value={config.primaryColor} />
-                    <ColorRow label="Primary Foreground" field="primaryForeground" value={config.primaryForeground || 'oklch(0.985 0 0)'} />
+                    <ColorRow label="Primary Foreground" field="primaryForeground" value={config.primaryForeground || 'oklch(0.205 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="secondary" title="Secondary Colors">
-                    <ColorRow label="Secondary" field="secondaryColor" value={config.secondaryColor || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Secondary" field="secondaryColor" value={config.secondaryColor || 'oklch(0.269 0 0)'} />
                     <ColorRow label="Secondary Foreground" field="secondaryForeground" value={config.secondaryForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="accent" title="Accent Colors">
-                    <ColorRow label="Accent" field="accentColor" value={config.accentColor || 'oklch(0.37 0.013 285.805)'} />
+                    <ColorRow label="Accent" field="accentColor" value={config.accentColor || 'oklch(0.371 0 0)'} />
                     <ColorRow label="Accent Foreground" field="accentForeground" value={config.accentForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
             </>
