@@ -9,69 +9,179 @@ interface ThemeEditorProps {
   onChange: (newConfig: ThemeConfig) => void;
 }
 
-// Full Tailwind CSS Palette Map
+// Full Tailwind CSS Palette Map (OKLCH)
 const TAILWIND_PALETTE: Record<string, Record<string, string>> = {
-  Slate: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
-  Gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 400: '#9ca3af', 500: '#6b7280', 600: '#4b5563', 700: '#374151', 800: '#1f2937', 900: '#111827', 950: '#030712' },
-  Zinc: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46', 800: '#27272a', 900: '#18181b', 950: '#09090b' },
-  Neutral: { 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4', 400: '#a3a3a3', 500: '#737373', 600: '#525252', 700: '#404040', 800: '#262626', 900: '#171717', 950: '#0a0a0a' },
-  Stone: { 50: '#fafaf9', 100: '#f5f5f4', 200: '#e7e5e4', 300: '#d6d3d1', 400: '#a8a29e', 500: '#78716c', 600: '#57534e', 700: '#44403c', 800: '#292524', 900: '#1c1917', 950: '#0c0a09' },
-  Red: { 50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d', 950: '#450a0a' },
-  Orange: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12', 950: '#431407' },
-  Amber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f', 950: '#451a03' },
-  Yellow: { 50: '#fefce8', 100: '#fef9c3', 200: '#fef08a', 300: '#fde047', 400: '#facc15', 500: '#eab308', 600: '#ca8a04', 700: '#a16207', 800: '#854d0e', 900: '#713f12', 950: '#422006' },
-  Lime: { 50: '#f7fee7', 100: '#ecfccb', 200: '#d9f99d', 300: '#bef264', 400: '#a3e635', 500: '#84cc16', 600: '#65a30d', 700: '#4d7c0f', 800: '#3f6212', 900: '#365314', 950: '#1a2e05' },
-  Green: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d', 950: '#052e16' },
-  Emerald: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
-  Teal: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a', 950: '#042f2e' },
-  Cyan: { 50: '#ecfeff', 100: '#cffafe', 200: '#a5f3fc', 300: '#67e8f9', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490', 800: '#155e75', 900: '#164e63', 950: '#083344' },
-  Sky: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e', 950: '#082f49' },
-  Blue: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a', 950: '#172554' },
-  Indigo: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81', 950: '#1e1b4b' },
-  Violet: { 50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd', 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9', 800: '#5b21b6', 900: '#4c1d95', 950: '#2e1065' },
-  Purple: { 50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 300: '#d8b4fe', 400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce', 800: '#6b21a8', 900: '#581c87', 950: '#3b0764' },
-  Fuchsia: { 50: '#fdf4ff', 100: '#fae8ff', 200: '#f5d0fe', 300: '#f0abfc', 400: '#e879f9', 500: '#d946ef', 600: '#c026d3', 700: '#a21caf', 800: '#86198f', 900: '#701a75', 950: '#4a044e' },
-  Pink: { 50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8', 300: '#f9a8d4', 400: '#f472b6', 500: '#ec4899', 600: '#db2777', 700: '#be185d', 800: '#9d174d', 900: '#831843', 950: '#500724' },
-  Rose: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' },
+  Slate: { 
+    50: 'oklch(0.984 0.003 247.858)', 100: 'oklch(0.968 0.007 247.896)', 200: 'oklch(0.929 0.013 255.508)', 
+    300: 'oklch(0.869 0.022 252.894)', 400: 'oklch(0.704 0.04 256.79)', 500: 'oklch(0.554 0.046 257.417)', 
+    600: 'oklch(0.446 0.043 257.281)', 700: 'oklch(0.372 0.044 257.287)', 800: 'oklch(0.279 0.041 260.031)', 
+    900: 'oklch(0.208 0.042 265.755)', 950: 'oklch(0.129 0.042 264.695)' 
+  },
+  Gray: { 
+    50: 'oklch(0.985 0.002 247.839)', 100: 'oklch(0.967 0.003 264.542)', 200: 'oklch(0.928 0.006 264.531)', 
+    300: 'oklch(0.872 0.01 258.338)', 400: 'oklch(0.707 0.022 261.325)', 500: 'oklch(0.551 0.027 264.364)', 
+    600: 'oklch(0.446 0.03 256.802)', 700: 'oklch(0.373 0.034 259.733)', 800: 'oklch(0.278 0.033 256.848)', 
+    900: 'oklch(0.21 0.034 264.665)', 950: 'oklch(0.13 0.028 261.692)' 
+  },
+  Zinc: { 
+    50: 'oklch(0.985 0 0)', 100: 'oklch(0.967 0.001 286.375)', 200: 'oklch(0.92 0.004 286.32)', 
+    300: 'oklch(0.871 0.006 286.286)', 400: 'oklch(0.705 0.015 286.067)', 500: 'oklch(0.552 0.016 285.938)', 
+    600: 'oklch(0.442 0.017 285.786)', 700: 'oklch(0.37 0.013 285.805)', 800: 'oklch(0.274 0.006 286.033)', 
+    900: 'oklch(0.21 0.006 285.885)', 950: 'oklch(0.141 0.005 285.823)' 
+  },
+  Neutral: { 
+    50: 'oklch(0.985 0 0)', 100: 'oklch(0.97 0 0)', 200: 'oklch(0.922 0 0)', 
+    300: 'oklch(0.87 0 0)', 400: 'oklch(0.708 0 0)', 500: 'oklch(0.556 0 0)', 
+    600: 'oklch(0.439 0 0)', 700: 'oklch(0.371 0 0)', 800: 'oklch(0.269 0 0)', 
+    900: 'oklch(0.205 0 0)', 950: 'oklch(0.145 0 0)' 
+  },
+  Stone: { 
+    50: 'oklch(0.985 0.001 106.423)', 100: 'oklch(0.97 0.001 106.424)', 200: 'oklch(0.923 0.003 48.717)', 
+    300: 'oklch(0.869 0.005 56.366)', 400: 'oklch(0.709 0.01 56.259)', 500: 'oklch(0.553 0.013 58.071)', 
+    600: 'oklch(0.444 0.011 73.639)', 700: 'oklch(0.374 0.01 67.558)', 800: 'oklch(0.268 0.007 34.298)', 
+    900: 'oklch(0.216 0.006 56.043)', 950: 'oklch(0.147 0.004 49.25)' 
+  },
+  Red: { 
+    50: 'oklch(0.971 0.013 17.38)', 100: 'oklch(0.936 0.032 17.717)', 200: 'oklch(0.885 0.062 18.334)', 
+    300: 'oklch(0.808 0.114 19.571)', 400: 'oklch(0.704 0.191 22.216)', 500: 'oklch(0.637 0.237 25.331)', 
+    600: 'oklch(0.577 0.245 27.325)', 700: 'oklch(0.505 0.213 27.518)', 800: 'oklch(0.424 0.199 26.529)', 
+    900: 'oklch(0.379 0.146 25.485)', 950: 'oklch(0.282 0.091 26.79)' 
+  },
+  Orange: { 
+    50: 'oklch(0.98 0.016 73.684)', 100: 'oklch(0.954 0.038 75.164)', 200: 'oklch(0.901 0.076 70.697)', 
+    300: 'oklch(0.837 0.128 66.29)', 400: 'oklch(0.75 0.183 55.934)', 500: 'oklch(0.705 0.213 47.675)', 
+    600: 'oklch(0.646 0.222 41.116)', 700: 'oklch(0.553 0.195 38.402)', 800: 'oklch(0.47 0.157 37.304)', 
+    900: 'oklch(0.408 0.123 38.172)', 950: 'oklch(0.266 0.079 36.259)' 
+  },
+  Amber: { 
+    50: 'oklch(0.987 0.022 95.277)', 100: 'oklch(0.962 0.059 95.617)', 200: 'oklch(0.924 0.12 95.746)', 
+    300: 'oklch(0.879 0.169 91.605)', 400: 'oklch(0.828 0.189 84.429)', 500: 'oklch(0.769 0.188 70.08)', 
+    600: 'oklch(0.666 0.179 58.318)', 700: 'oklch(0.555 0.163 48.998)', 800: 'oklch(0.473 0.137 46.201)', 
+    900: 'oklch(0.419 0.114 45.879)', 950: 'oklch(0.266 0.065 45.302)' 
+  },
+  Yellow: { 
+    50: 'oklch(0.987 0.026 102.212)', 100: 'oklch(0.973 0.071 103.193)', 200: 'oklch(0.945 0.129 101.54)', 
+    300: 'oklch(0.905 0.182 98.111)', 400: 'oklch(0.852 0.199 91.936)', 500: 'oklch(0.795 0.184 86.047)', 
+    600: 'oklch(0.681 0.162 75.834)', 700: 'oklch(0.554 0.135 66.442)', 800: 'oklch(0.476 0.114 61.929)', 
+    900: 'oklch(0.421 0.095 57.708)', 950: 'oklch(0.243 0.066 56.589)' 
+  },
+  Lime: { 
+    50: 'oklch(0.986 0.031 120.757)', 100: 'oklch(0.967 0.067 122.328)', 200: 'oklch(0.938 0.127 124.321)', 
+    300: 'oklch(0.897 0.196 126.665)', 400: 'oklch(0.841 0.238 128.85)', 500: 'oklch(0.768 0.233 130.85)', 
+    600: 'oklch(0.648 0.2 131.684)', 700: 'oklch(0.532 0.157 131.589)', 800: 'oklch(0.453 0.124 130.933)', 
+    900: 'oklch(0.405 0.101 131.063)', 950: 'oklch(0.241 0.053 131.284)' 
+  },
+  Green: { 
+    50: 'oklch(0.982 0.018 155.826)', 100: 'oklch(0.962 0.044 156.743)', 200: 'oklch(0.925 0.084 155.995)', 
+    300: 'oklch(0.871 0.15 154.449)', 400: 'oklch(0.792 0.209 151.711)', 500: 'oklch(0.723 0.219 149.579)', 
+    600: 'oklch(0.627 0.194 149.214)', 700: 'oklch(0.527 0.154 150.069)', 800: 'oklch(0.448 0.119 151.328)', 
+    900: 'oklch(0.393 0.095 152.541)', 950: 'oklch(0.248 0.052 154.619)' 
+  },
+  Emerald: { 
+    50: 'oklch(0.979 0.021 166.113)', 100: 'oklch(0.95 0.052 163.051)', 200: 'oklch(0.905 0.093 164.15)', 
+    300: 'oklch(0.845 0.143 164.978)', 400: 'oklch(0.765 0.177 163.223)', 500: 'oklch(0.696 0.17 162.48)', 
+    600: 'oklch(0.596 0.145 163.225)', 700: 'oklch(0.508 0.118 165.612)', 800: 'oklch(0.432 0.095 166.913)', 
+    900: 'oklch(0.378 0.077 168.94)', 950: 'oklch(0.229 0.046 170.145)' 
+  },
+  Teal: { 
+    50: 'oklch(0.984 0.014 180.299)', 100: 'oklch(0.955 0.038 175.623)', 200: 'oklch(0.913 0.069 174.411)', 
+    300: 'oklch(0.851 0.098 173.357)', 400: 'oklch(0.777 0.126 172.593)', 500: 'oklch(0.704 0.14 172.503)', 
+    600: 'oklch(0.6 0.118 174.097)', 700: 'oklch(0.511 0.096 176.63)', 800: 'oklch(0.437 0.078 179.624)', 
+    900: 'oklch(0.386 0.063 181.825)', 950: 'oklch(0.237 0.037 182.887)' 
+  },
+  Cyan: { 
+    50: 'oklch(0.984 0.019 200.873)', 100: 'oklch(0.956 0.045 203.388)', 200: 'oklch(0.917 0.08 205.041)', 
+    300: 'oklch(0.865 0.127 207.011)', 400: 'oklch(0.789 0.154 211.53)', 500: 'oklch(0.715 0.143 215.221)', 
+    600: 'oklch(0.609 0.126 221.723)', 700: 'oklch(0.52 0.105 223.128)', 800: 'oklch(0.45 0.085 224.283)', 
+    900: 'oklch(0.398 0.07 227.392)', 950: 'oklch(0.26 0.044 233.097)' 
+  },
+  Sky: { 
+    50: 'oklch(0.977 0.013 236.62)', 100: 'oklch(0.951 0.026 236.824)', 200: 'oklch(0.901 0.058 230.902)', 
+    300: 'oklch(0.828 0.111 230.318)', 400: 'oklch(0.746 0.16 232.661)', 500: 'oklch(0.623 0.214 259.135)', 
+    600: 'oklch(0.519 0.253 263.777)', 700: 'oklch(0.446 0.229 266.302)', 800: 'oklch(0.385 0.189 266.085)', 
+    900: 'oklch(0.339 0.151 265.571)', 950: 'oklch(0.225 0.1 265.176)' 
+  },
+  Blue: { 
+    50: 'oklch(0.97 0.014 254.604)', 100: 'oklch(0.932 0.032 255.585)', 200: 'oklch(0.882 0.059 254.128)', 
+    300: 'oklch(0.809 0.105 251.813)', 400: 'oklch(0.707 0.165 254.624)', 500: 'oklch(0.623 0.214 259.135)', 
+    600: 'oklch(0.546 0.245 262.881)', 700: 'oklch(0.465 0.241 266.755)', 800: 'oklch(0.391 0.207 266.975)', 
+    900: 'oklch(0.333 0.17 266.732)', 950: 'oklch(0.231 0.122 267.751)' 
+  },
+  Indigo: { 
+    50: 'oklch(0.962 0.018 272.314)', 100: 'oklch(0.93 0.034 272.788)', 200: 'oklch(0.87 0.065 274.039)', 
+    300: 'oklch(0.785 0.115 274.713)', 400: 'oklch(0.673 0.182 276.935)', 500: 'oklch(0.585 0.233 277.117)', 
+    600: 'oklch(0.488 0.243 275.812)', 700: 'oklch(0.407 0.225 274.966)', 800: 'oklch(0.345 0.19 274.152)', 
+    900: 'oklch(0.297 0.156 275.272)', 950: 'oklch(0.183 0.108 275.723)' 
+  },
+  Violet: { 
+    50: 'oklch(0.969 0.016 293.756)', 100: 'oklch(0.943 0.029 294.588)', 200: 'oklch(0.894 0.057 293.283)', 
+    300: 'oklch(0.811 0.111 293.571)', 400: 'oklch(0.702 0.183 293.541)', 500: 'oklch(0.629 0.224 291.569)', 
+    600: 'oklch(0.558 0.226 287.794)', 700: 'oklch(0.485 0.198 285.594)', 800: 'oklch(0.403 0.161 283.822)', 
+    900: 'oklch(0.337 0.128 284.145)', 950: 'oklch(0.223 0.098 287.975)' 
+  },
+  Purple: { 
+    50: 'oklch(0.977 0.014 308.299)', 100: 'oklch(0.946 0.033 307.174)', 200: 'oklch(0.902 0.063 306.703)', 
+    300: 'oklch(0.827 0.119 306.383)', 400: 'oklch(0.714 0.203 305.504)', 500: 'oklch(0.627 0.265 303.9)', 
+    600: 'oklch(0.536 0.249 300.957)', 700: 'oklch(0.449 0.211 299.789)', 800: 'oklch(0.373 0.169 297.359)', 
+    900: 'oklch(0.312 0.134 296.793)', 950: 'oklch(0.193 0.107 298.537)' 
+  },
+  Fuchsia: { 
+    50: 'oklch(0.977 0.017 320.058)', 100: 'oklch(0.952 0.037 318.852)', 200: 'oklch(0.903 0.076 319.62)', 
+    300: 'oklch(0.833 0.145 321.434)', 400: 'oklch(0.74 0.238 322.16)', 500: 'oklch(0.667 0.288 322.15)', 
+    600: 'oklch(0.566 0.267 322.253)', 700: 'oklch(0.486 0.215 322.067)', 800: 'oklch(0.408 0.167 321.688)', 
+    900: 'oklch(0.341 0.129 321.157)', 950: 'oklch(0.217 0.091 321.056)' 
+  },
+  Pink: { 
+    50: 'oklch(0.971 0.014 343.198)', 100: 'oklch(0.948 0.028 342.258)', 200: 'oklch(0.899 0.061 343.231)', 
+    300: 'oklch(0.823 0.12 346.018)', 400: 'oklch(0.718 0.202 349.761)', 500: 'oklch(0.656 0.241 354.308)', 
+    600: 'oklch(0.592 0.249 0.551)', 700: 'oklch(0.525 0.223 3.958)', 800: 'oklch(0.447 0.183 5.484)', 
+    900: 'oklch(0.384 0.146 5.897)', 950: 'oklch(0.242 0.103 6.942)' 
+  },
+  Rose: { 
+    50: 'oklch(0.969 0.015 12.422)', 100: 'oklch(0.941 0.03 12.541)', 200: 'oklch(0.892 0.058 10.015)', 
+    300: 'oklch(0.81 0.117 11.638)', 400: 'oklch(0.712 0.194 13.428)', 500: 'oklch(0.645 0.246 16.439)', 
+    600: 'oklch(0.586 0.253 17.585)', 700: 'oklch(0.491 0.22 21.082)', 800: 'oklch(0.424 0.191 22.846)', 
+    900: 'oklch(0.378 0.147 23.821)', 950: 'oklch(0.257 0.092 23.364)' 
+  },
 };
 
 const PRESETS: { name: string; description: string; config: Partial<ThemeConfig> }[] = [
   {
     name: 'Default',
-    description: 'System Default',
+    description: 'System Default (OKLCH)',
     config: {
-        primaryColor: '#fafafa',
-        primaryForeground: '#18181b',
-        secondaryColor: '#27272a',
-        secondaryForeground: '#fafafa',
-        accentColor: '#3f3f46',
-        accentForeground: '#fafafa',
-        background: '#09090b',
-        foreground: '#fafafa',
-        card: '#09090b',
-        cardForeground: '#fafafa',
-        popover: '#09090b',
-        popoverForeground: '#fafafa',
-        muted: '#27272a',
-        mutedForeground: '#a1a1aa',
-        destructive: '#7f1d1d',
-        destructiveForeground: '#fafafa',
-        border: '#27272a',
-        input: '#27272a',
-        ring: '#a1a1aa',
-        chart1: '#91c5ff',
-        chart2: '#3a81f6',
-        chart3: '#2563ef',
-        chart4: '#1a4eda',
-        chart5: '#1f3fad',
-        sidebar: '#18181b',
-        sidebarForeground: '#fafafa',
-        sidebarPrimary: '#3f3f46',
-        sidebarPrimaryForeground: '#fafafa',
-        sidebarAccent: '#27272a',
-        sidebarAccentForeground: '#fafafa',
-        sidebarBorder: '#27272a',
-        sidebarRing: '#a1a1aa',
+        primaryColor: 'oklch(0.985 0 0)', // Zinc 50
+        primaryForeground: 'oklch(0.21 0.006 285.885)', // Zinc 900
+        secondaryColor: 'oklch(0.274 0.006 286.033)', // Zinc 800
+        secondaryForeground: 'oklch(0.985 0 0)',
+        accentColor: 'oklch(0.37 0.013 285.805)', // Zinc 700
+        accentForeground: 'oklch(0.985 0 0)',
+        background: 'oklch(0.141 0.005 285.823)', // Zinc 950
+        foreground: 'oklch(0.985 0 0)', // Zinc 50
+        card: 'oklch(0.141 0.005 285.823)',
+        cardForeground: 'oklch(0.985 0 0)',
+        popover: 'oklch(0.141 0.005 285.823)',
+        popoverForeground: 'oklch(0.985 0 0)',
+        muted: 'oklch(0.274 0.006 286.033)',
+        mutedForeground: 'oklch(0.705 0.015 286.067)', // Zinc 400
+        destructive: 'oklch(0.379 0.146 25.485)', // Red 900
+        destructiveForeground: 'oklch(0.985 0 0)',
+        border: 'oklch(0.274 0.006 286.033)', // Zinc 800
+        input: 'oklch(0.274 0.006 286.033)',
+        ring: 'oklch(0.705 0.015 286.067)',
+        chart1: 'oklch(0.746 0.16 232.661)', // Sky 400
+        chart2: 'oklch(0.623 0.214 259.135)', // Blue 500
+        chart3: 'oklch(0.546 0.245 262.881)', // Blue 600
+        chart4: 'oklch(0.465 0.241 266.755)', // Blue 700
+        chart5: 'oklch(0.391 0.207 266.975)', // Blue 800
+        sidebar: 'oklch(0.21 0.006 285.885)', // Zinc 900
+        sidebarForeground: 'oklch(0.985 0 0)',
+        sidebarPrimary: 'oklch(0.37 0.013 285.805)', // Zinc 700
+        sidebarPrimaryForeground: 'oklch(0.985 0 0)',
+        sidebarAccent: 'oklch(0.274 0.006 286.033)', // Zinc 800
+        sidebarAccentForeground: 'oklch(0.985 0 0)',
+        sidebarBorder: 'oklch(0.274 0.006 286.033)',
+        sidebarRing: 'oklch(0.705 0.015 286.067)',
         radius: 0.625,
         mode: 'dark',
         style: 'default',
@@ -125,46 +235,47 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
     
     const isDark = mode === 'dark';
     
+    // Switch to Zinc-based OKLCH values for defaults
     onChange({
         ...config,
         mode: mode,
         // Base
-        background: isDark ? '#09090b' : '#ffffff',
-        foreground: isDark ? '#fafafa' : '#09090b',
+        background: isDark ? 'oklch(0.141 0.005 285.823)' : 'oklch(1 0 0)',
+        foreground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.141 0.005 285.823)',
         // Card
-        card: isDark ? '#09090b' : '#ffffff',
-        cardForeground: isDark ? '#fafafa' : '#09090b',
+        card: isDark ? 'oklch(0.141 0.005 285.823)' : 'oklch(1 0 0)',
+        cardForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.141 0.005 285.823)',
         // Popover
-        popover: isDark ? '#09090b' : '#ffffff',
-        popoverForeground: isDark ? '#fafafa' : '#09090b',
+        popover: isDark ? 'oklch(0.141 0.005 285.823)' : 'oklch(1 0 0)',
+        popoverForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.141 0.005 285.823)',
         // Primary
-        primaryColor: isDark ? '#fafafa' : '#18181b',
-        primaryForeground: isDark ? '#18181b' : '#fafafa',
+        primaryColor: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
+        primaryForeground: isDark ? 'oklch(0.21 0.006 285.885)' : 'oklch(0.985 0 0)',
         // Secondary
-        secondaryColor: isDark ? '#27272a' : '#f4f4f5',
-        secondaryForeground: isDark ? '#fafafa' : '#18181b',
+        secondaryColor: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.967 0.001 286.375)',
+        secondaryForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
         // Muted
-        muted: isDark ? '#27272a' : '#f4f4f5',
-        mutedForeground: isDark ? '#a1a1aa' : '#71717a',
+        muted: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.967 0.001 286.375)',
+        mutedForeground: isDark ? 'oklch(0.705 0.015 286.067)' : 'oklch(0.552 0.016 285.938)',
         // Accent
-        accentColor: isDark ? '#3f3f46' : '#f4f4f5',
-        accentForeground: isDark ? '#fafafa' : '#18181b',
+        accentColor: isDark ? 'oklch(0.37 0.013 285.805)' : 'oklch(0.967 0.001 286.375)',
+        accentForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
         // Destructive
-        destructive: isDark ? '#7f1d1d' : '#ef4444',
-        destructiveForeground: '#fafafa', // usually white on red for both
+        destructive: isDark ? 'oklch(0.379 0.146 25.485)' : 'oklch(0.637 0.237 25.331)',
+        destructiveForeground: 'oklch(0.985 0 0)', 
         // Border/Input
-        border: isDark ? '#27272a' : '#e4e4e7',
-        input: isDark ? '#27272a' : '#e4e4e7',
-        ring: isDark ? '#a1a1aa' : '#18181b',
+        border: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
+        input: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
+        ring: isDark ? 'oklch(0.705 0.015 286.067)' : 'oklch(0.552 0.016 285.938)',
         // Sidebar
-        sidebar: isDark ? '#18181b' : '#f4f4f5',
-        sidebarForeground: isDark ? '#fafafa' : '#09090b',
-        sidebarPrimary: isDark ? '#3f3f46' : '#18181b',
-        sidebarPrimaryForeground: isDark ? '#fafafa' : '#fafafa',
-        sidebarAccent: isDark ? '#27272a' : '#e4e4e7',
-        sidebarAccentForeground: isDark ? '#fafafa' : '#09090b',
-        sidebarBorder: isDark ? '#27272a' : '#e4e4e7',
-        sidebarRing: isDark ? '#a1a1aa' : '#a1a1aa',
+        sidebar: isDark ? 'oklch(0.21 0.006 285.885)' : 'oklch(0.967 0.001 286.375)',
+        sidebarForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
+        sidebarPrimary: isDark ? 'oklch(0.37 0.013 285.805)' : 'oklch(0.21 0.006 285.885)',
+        sidebarPrimaryForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.985 0 0)',
+        sidebarAccent: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
+        sidebarAccentForeground: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.21 0.006 285.885)',
+        sidebarBorder: isDark ? 'oklch(0.274 0.006 286.033)' : 'oklch(0.92 0.004 286.32)',
+        sidebarRing: isDark ? 'oklch(0.705 0.015 286.067)' : 'oklch(0.705 0.015 286.067)',
     });
   };
 
@@ -304,68 +415,68 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
         {activeTab === 'colors' && (
             <>
                 <CollapsibleSection id="sidebar" title="Sidebar Colors">
-                    <ColorRow label="Sidebar Background" field="sidebar" value={config.sidebar || '#18181b'} />
-                    <ColorRow label="Sidebar Foreground" field="sidebarForeground" value={config.sidebarForeground || '#fafafa'} />
-                    <ColorRow label="Sidebar Primary" field="sidebarPrimary" value={config.sidebarPrimary || '#3f3f46'} />
-                    <ColorRow label="Sidebar Primary Foreground" field="sidebarPrimaryForeground" value={config.sidebarPrimaryForeground || '#fafafa'} />
-                    <ColorRow label="Sidebar Accent" field="sidebarAccent" value={config.sidebarAccent || '#27272a'} />
-                    <ColorRow label="Sidebar Accent Foreground" field="sidebarAccentForeground" value={config.sidebarAccentForeground || '#fafafa'} />
-                    <ColorRow label="Sidebar Border" field="sidebarBorder" value={config.sidebarBorder || '#27272a'} />
-                    <ColorRow label="Sidebar Ring" field="sidebarRing" value={config.sidebarRing || '#a1a1aa'} />
+                    <ColorRow label="Sidebar Background" field="sidebar" value={config.sidebar || 'oklch(0.21 0.006 285.885)'} />
+                    <ColorRow label="Sidebar Foreground" field="sidebarForeground" value={config.sidebarForeground || 'oklch(0.985 0 0)'} />
+                    <ColorRow label="Sidebar Primary" field="sidebarPrimary" value={config.sidebarPrimary || 'oklch(0.37 0.013 285.805)'} />
+                    <ColorRow label="Sidebar Primary Foreground" field="sidebarPrimaryForeground" value={config.sidebarPrimaryForeground || 'oklch(0.985 0 0)'} />
+                    <ColorRow label="Sidebar Accent" field="sidebarAccent" value={config.sidebarAccent || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Sidebar Accent Foreground" field="sidebarAccentForeground" value={config.sidebarAccentForeground || 'oklch(0.985 0 0)'} />
+                    <ColorRow label="Sidebar Border" field="sidebarBorder" value={config.sidebarBorder || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Sidebar Ring" field="sidebarRing" value={config.sidebarRing || 'oklch(0.705 0.015 286.067)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="charts" title="Chart Colors">
-                    <ColorRow label="Chart 1" field="chart1" value={config.chart1 || '#91c5ff'} />
-                    <ColorRow label="Chart 2" field="chart2" value={config.chart2 || '#3a81f6'} />
-                    <ColorRow label="Chart 3" field="chart3" value={config.chart3 || '#2563ef'} />
-                    <ColorRow label="Chart 4" field="chart4" value={config.chart4 || '#1a4eda'} />
-                    <ColorRow label="Chart 5" field="chart5" value={config.chart5 || '#1f3fad'} />
+                    <ColorRow label="Chart 1" field="chart1" value={config.chart1 || 'oklch(0.746 0.16 232.661)'} />
+                    <ColorRow label="Chart 2" field="chart2" value={config.chart2 || 'oklch(0.623 0.214 259.135)'} />
+                    <ColorRow label="Chart 3" field="chart3" value={config.chart3 || 'oklch(0.546 0.245 262.881)'} />
+                    <ColorRow label="Chart 4" field="chart4" value={config.chart4 || 'oklch(0.465 0.241 266.755)'} />
+                    <ColorRow label="Chart 5" field="chart5" value={config.chart5 || 'oklch(0.391 0.207 266.975)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="base" title="Base Colors">
-                    <ColorRow label="Background" field="background" value={config.background || '#09090b'} />
-                    <ColorRow label="Foreground" field="foreground" value={config.foreground || '#fafafa'} />
+                    <ColorRow label="Background" field="background" value={config.background || 'oklch(0.141 0.005 285.823)'} />
+                    <ColorRow label="Foreground" field="foreground" value={config.foreground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="card" title="Card Colors">
-                    <ColorRow label="Card Background" field="card" value={config.card || '#09090b'} />
-                    <ColorRow label="Card Foreground" field="cardForeground" value={config.cardForeground || '#fafafa'} />
+                    <ColorRow label="Card Background" field="card" value={config.card || 'oklch(0.141 0.005 285.823)'} />
+                    <ColorRow label="Card Foreground" field="cardForeground" value={config.cardForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="popover" title="Popover Colors">
-                    <ColorRow label="Popover Background" field="popover" value={config.popover || '#09090b'} />
-                    <ColorRow label="Popover Foreground" field="popoverForeground" value={config.popoverForeground || '#fafafa'} />
+                    <ColorRow label="Popover Background" field="popover" value={config.popover || 'oklch(0.141 0.005 285.823)'} />
+                    <ColorRow label="Popover Foreground" field="popoverForeground" value={config.popoverForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="muted" title="Muted Colors">
-                    <ColorRow label="Muted" field="muted" value={config.muted || '#27272a'} />
-                    <ColorRow label="Muted Foreground" field="mutedForeground" value={config.mutedForeground || '#a1a1aa'} />
+                    <ColorRow label="Muted" field="muted" value={config.muted || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Muted Foreground" field="mutedForeground" value={config.mutedForeground || 'oklch(0.705 0.015 286.067)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="destructive" title="Destructive Colors">
-                    <ColorRow label="Destructive" field="destructive" value={config.destructive || '#7f1d1d'} />
-                    <ColorRow label="Destructive Foreground" field="destructiveForeground" value={config.destructiveForeground || '#fafafa'} />
+                    <ColorRow label="Destructive" field="destructive" value={config.destructive || 'oklch(0.379 0.146 25.485)'} />
+                    <ColorRow label="Destructive Foreground" field="destructiveForeground" value={config.destructiveForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="borderInput" title="Border & Input Colors">
-                    <ColorRow label="Border" field="border" value={config.border || '#27272a'} />
-                    <ColorRow label="Input" field="input" value={config.input || '#27272a'} />
-                    <ColorRow label="Ring" field="ring" value={config.ring || '#a1a1aa'} />
+                    <ColorRow label="Border" field="border" value={config.border || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Input" field="input" value={config.input || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Ring" field="ring" value={config.ring || 'oklch(0.705 0.015 286.067)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="primary" title="Primary Colors">
                     <ColorRow label="Primary" field="primaryColor" value={config.primaryColor} />
-                    <ColorRow label="Primary Foreground" field="primaryForeground" value={config.primaryForeground || '#fafafa'} />
+                    <ColorRow label="Primary Foreground" field="primaryForeground" value={config.primaryForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="secondary" title="Secondary Colors">
-                    <ColorRow label="Secondary" field="secondaryColor" value={config.secondaryColor || '#27272a'} />
-                    <ColorRow label="Secondary Foreground" field="secondaryForeground" value={config.secondaryForeground || '#fafafa'} />
+                    <ColorRow label="Secondary" field="secondaryColor" value={config.secondaryColor || 'oklch(0.274 0.006 286.033)'} />
+                    <ColorRow label="Secondary Foreground" field="secondaryForeground" value={config.secondaryForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
 
                 <CollapsibleSection id="accent" title="Accent Colors">
-                    <ColorRow label="Accent" field="accentColor" value={config.accentColor || '#3f3f46'} />
-                    <ColorRow label="Accent Foreground" field="accentForeground" value={config.accentForeground || '#fafafa'} />
+                    <ColorRow label="Accent" field="accentColor" value={config.accentColor || 'oklch(0.37 0.013 285.805)'} />
+                    <ColorRow label="Accent Foreground" field="accentForeground" value={config.accentForeground || 'oklch(0.985 0 0)'} />
                 </CollapsibleSection>
             </>
         )}

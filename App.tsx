@@ -8,6 +8,8 @@ import { SimulationHub } from './components/SimulationHub';
 import { ThemeEditor } from './components/ThemeEditor';
 import { MetricCard } from './components/MetricCard';
 import { RecentActivity } from './components/RecentActivity';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { 
   Mic, Send, ShieldAlert, Terminal, Activity, Code, Save, 
   GitBranch, Filter, X, Copy, Check, Layout, Settings,
@@ -102,38 +104,38 @@ const App: React.FC = () => {
   
   // Theme State
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>({
-    primaryColor: '#fafafa', 
-    primaryForeground: '#18181b',
-    secondaryColor: '#27272a',
-    secondaryForeground: '#fafafa',
-    accentColor: '#3f3f46',
-    accentForeground: '#fafafa',
-    background: '#09090b',
-    foreground: '#fafafa',
-    card: '#09090b',
-    cardForeground: '#fafafa',
-    popover: '#09090b',
-    popoverForeground: '#fafafa',
-    muted: '#27272a',
-    mutedForeground: '#a1a1aa',
-    destructive: '#7f1d1d',
-    destructiveForeground: '#fafafa',
-    border: '#27272a',
-    input: '#27272a',
-    ring: '#a1a1aa',
-    chart1: '#91c5ff',
-    chart2: '#3a81f6',
-    chart3: '#2563ef',
-    chart4: '#1a4eda',
-    chart5: '#1f3fad',
-    sidebar: '#18181b',
-    sidebarForeground: '#fafafa',
-    sidebarPrimary: '#3f3f46',
-    sidebarPrimaryForeground: '#fafafa',
-    sidebarAccent: '#27272a',
-    sidebarAccentForeground: '#fafafa',
-    sidebarBorder: '#27272a',
-    sidebarRing: '#a1a1aa',
+    primaryColor: 'oklch(0.985 0 0)', 
+    primaryForeground: 'oklch(0.21 0.006 285.885)',
+    secondaryColor: 'oklch(0.274 0.006 286.033)',
+    secondaryForeground: 'oklch(0.985 0 0)',
+    accentColor: 'oklch(0.37 0.013 285.805)',
+    accentForeground: 'oklch(0.985 0 0)',
+    background: 'oklch(0.141 0.005 285.823)',
+    foreground: 'oklch(0.985 0 0)',
+    card: 'oklch(0.141 0.005 285.823)',
+    cardForeground: 'oklch(0.985 0 0)',
+    popover: 'oklch(0.141 0.005 285.823)',
+    popoverForeground: 'oklch(0.985 0 0)',
+    muted: 'oklch(0.274 0.006 286.033)',
+    mutedForeground: 'oklch(0.705 0.015 286.067)',
+    destructive: 'oklch(0.379 0.146 25.485)',
+    destructiveForeground: 'oklch(0.985 0 0)',
+    border: 'oklch(0.274 0.006 286.033)',
+    input: 'oklch(0.274 0.006 286.033)',
+    ring: 'oklch(0.705 0.015 286.067)',
+    chart1: 'oklch(0.746 0.16 232.661)',
+    chart2: 'oklch(0.623 0.214 259.135)',
+    chart3: 'oklch(0.546 0.245 262.881)',
+    chart4: 'oklch(0.465 0.241 266.755)',
+    chart5: 'oklch(0.391 0.207 266.975)',
+    sidebar: 'oklch(0.21 0.006 285.885)',
+    sidebarForeground: 'oklch(0.985 0 0)',
+    sidebarPrimary: 'oklch(0.37 0.013 285.805)',
+    sidebarPrimaryForeground: 'oklch(0.985 0 0)',
+    sidebarAccent: 'oklch(0.274 0.006 286.033)',
+    sidebarAccentForeground: 'oklch(0.985 0 0)',
+    sidebarBorder: 'oklch(0.274 0.006 286.033)',
+    sidebarRing: 'oklch(0.705 0.015 286.067)',
     radius: 0.625,
     mode: 'dark',
     style: 'default',
@@ -330,39 +332,39 @@ const App: React.FC = () => {
     
     const cssRegex = /\[CSS_VARS\][\s\S]*?\[\/CSS_VARS\]/g;
     const dynamicCss = DEFAULT_CSS_TEMPLATE
-      .replace(/{{BACKGROUND}}/g, themeConfig.background || '#09090b')
-      .replace(/{{FOREGROUND}}/g, themeConfig.foreground || '#fafafa')
+      .replace(/{{BACKGROUND}}/g, themeConfig.background || 'oklch(0.141 0.005 285.823)')
+      .replace(/{{FOREGROUND}}/g, themeConfig.foreground || 'oklch(0.985 0 0)')
       // ... (Rest of replacements)
-      .replace(/{{CARD}}/g, themeConfig.card || '#09090b')
-      .replace(/{{CARD_FOREGROUND}}/g, themeConfig.cardForeground || '#fafafa')
-      .replace(/{{POPOVER}}/g, themeConfig.popover || '#09090b')
-      .replace(/{{POPOVER_FOREGROUND}}/g, themeConfig.popoverForeground || '#fafafa')
+      .replace(/{{CARD}}/g, themeConfig.card || 'oklch(0.141 0.005 285.823)')
+      .replace(/{{CARD_FOREGROUND}}/g, themeConfig.cardForeground || 'oklch(0.985 0 0)')
+      .replace(/{{POPOVER}}/g, themeConfig.popover || 'oklch(0.141 0.005 285.823)')
+      .replace(/{{POPOVER_FOREGROUND}}/g, themeConfig.popoverForeground || 'oklch(0.985 0 0)')
       .replace(/{{PRIMARY_COLOR}}/g, themeConfig.primaryColor)
-      .replace(/{{PRIMARY_FOREGROUND}}/g, themeConfig.primaryForeground || '#fafafa')
-      .replace(/{{SECONDARY_COLOR}}/g, themeConfig.secondaryColor || '#27272a')
-      .replace(/{{SECONDARY_FOREGROUND}}/g, themeConfig.secondaryForeground || '#fafafa')
-      .replace(/{{MUTED}}/g, themeConfig.muted || '#27272a')
-      .replace(/{{MUTED_FOREGROUND}}/g, themeConfig.mutedForeground || '#a1a1aa')
-      .replace(/{{ACCENT_COLOR}}/g, themeConfig.accentColor || '#3f3f46')
-      .replace(/{{ACCENT_FOREGROUND}}/g, themeConfig.accentForeground || '#fafafa')
-      .replace(/{{DESTRUCTIVE}}/g, themeConfig.destructive || '#7f1d1d')
-      .replace(/{{DESTRUCTIVE_FOREGROUND}}/g, themeConfig.destructiveForeground || '#fafafa')
-      .replace(/{{BORDER}}/g, themeConfig.border || '#27272a')
-      .replace(/{{INPUT}}/g, themeConfig.input || '#27272a')
-      .replace(/{{RING}}/g, themeConfig.ring || '#a1a1aa')
-      .replace(/{{CHART_1}}/g, themeConfig.chart1 || '#91c5ff')
-      .replace(/{{CHART_2}}/g, themeConfig.chart2 || '#3a81f6')
-      .replace(/{{CHART_3}}/g, themeConfig.chart3 || '#2563ef')
-      .replace(/{{CHART_4}}/g, themeConfig.chart4 || '#1a4eda')
-      .replace(/{{CHART_5}}/g, themeConfig.chart5 || '#1f3fad')
-      .replace(/{{SIDEBAR}}/g, themeConfig.sidebar || '#18181b')
-      .replace(/{{SIDEBAR_FOREGROUND}}/g, themeConfig.sidebarForeground || '#fafafa')
-      .replace(/{{SIDEBAR_PRIMARY}}/g, themeConfig.sidebarPrimary || '#3f3f46')
-      .replace(/{{SIDEBAR_PRIMARY_FOREGROUND}}/g, themeConfig.sidebarPrimaryForeground || '#fafafa')
-      .replace(/{{SIDEBAR_ACCENT}}/g, themeConfig.sidebarAccent || '#27272a')
-      .replace(/{{SIDEBAR_ACCENT_FOREGROUND}}/g, themeConfig.sidebarAccentForeground || '#fafafa')
-      .replace(/{{SIDEBAR_BORDER}}/g, themeConfig.sidebarBorder || '#27272a')
-      .replace(/{{SIDEBAR_RING}}/g, themeConfig.sidebarRing || '#a1a1aa')
+      .replace(/{{PRIMARY_FOREGROUND}}/g, themeConfig.primaryForeground || 'oklch(0.985 0 0)')
+      .replace(/{{SECONDARY_COLOR}}/g, themeConfig.secondaryColor || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{SECONDARY_FOREGROUND}}/g, themeConfig.secondaryForeground || 'oklch(0.985 0 0)')
+      .replace(/{{MUTED}}/g, themeConfig.muted || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{MUTED_FOREGROUND}}/g, themeConfig.mutedForeground || 'oklch(0.705 0.015 286.067)')
+      .replace(/{{ACCENT_COLOR}}/g, themeConfig.accentColor || 'oklch(0.37 0.013 285.805)')
+      .replace(/{{ACCENT_FOREGROUND}}/g, themeConfig.accentForeground || 'oklch(0.985 0 0)')
+      .replace(/{{DESTRUCTIVE}}/g, themeConfig.destructive || 'oklch(0.379 0.146 25.485)')
+      .replace(/{{DESTRUCTIVE_FOREGROUND}}/g, themeConfig.destructiveForeground || 'oklch(0.985 0 0)')
+      .replace(/{{BORDER}}/g, themeConfig.border || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{INPUT}}/g, themeConfig.input || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{RING}}/g, themeConfig.ring || 'oklch(0.705 0.015 286.067)')
+      .replace(/{{CHART_1}}/g, themeConfig.chart1 || 'oklch(0.746 0.16 232.661)')
+      .replace(/{{CHART_2}}/g, themeConfig.chart2 || 'oklch(0.623 0.214 259.135)')
+      .replace(/{{CHART_3}}/g, themeConfig.chart3 || 'oklch(0.546 0.245 262.881)')
+      .replace(/{{CHART_4}}/g, themeConfig.chart4 || 'oklch(0.465 0.241 266.755)')
+      .replace(/{{CHART_5}}/g, themeConfig.chart5 || 'oklch(0.391 0.207 266.975)')
+      .replace(/{{SIDEBAR}}/g, themeConfig.sidebar || 'oklch(0.21 0.006 285.885)')
+      .replace(/{{SIDEBAR_FOREGROUND}}/g, themeConfig.sidebarForeground || 'oklch(0.985 0 0)')
+      .replace(/{{SIDEBAR_PRIMARY}}/g, themeConfig.sidebarPrimary || 'oklch(0.37 0.013 285.805)')
+      .replace(/{{SIDEBAR_PRIMARY_FOREGROUND}}/g, themeConfig.sidebarPrimaryForeground || 'oklch(0.985 0 0)')
+      .replace(/{{SIDEBAR_ACCENT}}/g, themeConfig.sidebarAccent || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{SIDEBAR_ACCENT_FOREGROUND}}/g, themeConfig.sidebarAccentForeground || 'oklch(0.985 0 0)')
+      .replace(/{{SIDEBAR_BORDER}}/g, themeConfig.sidebarBorder || 'oklch(0.274 0.006 286.033)')
+      .replace(/{{SIDEBAR_RING}}/g, themeConfig.sidebarRing || 'oklch(0.705 0.015 286.067)')
       .replace(/{{RADIUS}}/g, themeConfig.radius.toString());
 
     return cssRegex.test(spec) ? spec.replace(cssRegex, dynamicCss) : spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n${dynamicCss}`);
@@ -735,14 +737,66 @@ const App: React.FC = () => {
                             </button>
                          </div>
                       </div>
-                      <div className="flex-1 overflow-auto p-6 font-mono text-xs leading-relaxed text-foreground bg-card/50">
-                          <pre className="whitespace-pre-wrap">
-                             {codeSubTab === 'requirements' && (currentBlueprint.requirementsSpec || 'No Requirements Generated.')}
-                             {codeSubTab === 'frontend' && displayedFrontendSpec}
-                             {codeSubTab === 'backend' && currentBlueprint.backendSpec}
-                             {codeSubTab === 'database' && currentBlueprint.databaseSpec}
-                             {codeSubTab === 'infrastructure' && currentBlueprint.godModePrompt}
-                          </pre>
+                      <div className="flex-1 overflow-auto p-8 md:p-12 bg-card/50">
+                        <div className="max-w-5xl mx-auto pb-20">
+                           <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                 h1: ({node, ...props}) => <h1 className="text-3xl font-bold tracking-tight text-primary border-b border-border pb-2 mt-8 mb-6 first:mt-0" {...props} />,
+                                 h2: ({node, ...props}) => <h2 className="text-2xl font-bold tracking-tight text-foreground mt-8 mb-4" {...props} />,
+                                 h3: ({node, ...props}) => <h3 className="text-xl font-bold tracking-tight text-foreground mt-6 mb-3" {...props} />,
+                                 h4: ({node, ...props}) => <h4 className="text-lg font-bold text-foreground mt-6 mb-2" {...props} />,
+                                 p: ({node, ...props}) => <p className="leading-7 mb-4 text-sm text-muted-foreground" {...props} />,
+                                 ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 text-sm text-muted-foreground space-y-1" {...props} />,
+                                 ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 text-sm text-muted-foreground space-y-1" {...props} />,
+                                 li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                 blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary/50 pl-4 italic text-muted-foreground mb-6" {...props} />,
+                                 a: ({node, ...props}) => <a className="font-medium text-primary hover:underline underline-offset-4" {...props} />,
+                                 table: ({node, ...props}) => <div className="my-6 w-full overflow-y-auto rounded-lg border border-border"><table className="w-full text-sm" {...props} /></div>,
+                                 thead: ({node, ...props}) => <thead className="bg-muted text-muted-foreground font-medium border-b border-border" {...props} />,
+                                 th: ({node, ...props}) => <th className="px-4 py-3 text-left font-bold" {...props} />,
+                                 tbody: ({node, ...props}) => <tbody className="divide-y divide-border bg-card" {...props} />,
+                                 tr: ({node, ...props}) => <tr className="transition-colors hover:bg-muted/50" {...props} />,
+                                 td: ({node, ...props}) => <td className="px-4 py-3 align-top" {...props} />,
+                                 code: ({node, className, children, ...props}: any) => {
+                                    const match = /language-(\w+)/.exec(className || '');
+                                    const isInline = !match && !String(children).includes('\n');
+                                    
+                                    if (isInline) {
+                                       return (
+                                          <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-primary border border-border" {...props}>
+                                             {children}
+                                          </code>
+                                       );
+                                    }
+
+                                    return (
+                                       <div className="relative rounded-lg border border-border bg-muted/30 my-6 group">
+                                          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50">
+                                             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">{match?.[1] || 'text'}</span>
+                                             <div className="flex gap-1.5">
+                                                <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/30"></div>
+                                                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/30"></div>
+                                                <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/30"></div>
+                                             </div>
+                                          </div>
+                                          <pre className="p-4 overflow-x-auto text-sm font-mono leading-relaxed custom-scrollbar">
+                                             <code className={className} {...props}>
+                                                {children}
+                                             </code>
+                                          </pre>
+                                       </div>
+                                    );
+                                 }
+                              }}
+                           >
+                              {codeSubTab === 'frontend' ? displayedFrontendSpec :
+                               codeSubTab === 'backend' ? currentBlueprint.backendSpec :
+                               codeSubTab === 'database' ? currentBlueprint.databaseSpec :
+                               codeSubTab === 'requirements' ? currentBlueprint.requirementsSpec :
+                               currentBlueprint.godModePrompt}
+                           </ReactMarkdown>
+                        </div>
                       </div>
                    </div>
                 )}
