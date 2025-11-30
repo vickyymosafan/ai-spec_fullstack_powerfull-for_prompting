@@ -9,11 +9,19 @@ interface ThemeEditorProps {
   onChange: (newConfig: ThemeConfig) => void;
 }
 
-const PRESETS: { name: string; description: string; config: Partial<ThemeConfig> }[] = [
+interface PresetDefinition {
+  name: string;
+  description: string;
+  light: ThemeConfig;
+  dark: ThemeConfig;
+}
+
+const PRESETS: PresetDefinition[] = [
   {
     name: 'Default',
     description: 'System Default (OKLCH)',
-    config: DEFAULT_DARK_THEME
+    light: DEFAULT_LIGHT_THEME,
+    dark: DEFAULT_DARK_THEME
   }
 ];
 
@@ -57,12 +65,32 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
+  const handlePresetSelect = (preset: PresetDefinition) => {
+    // Apply the theme variant based on the CURRENT active mode
+    const targetTheme = config.mode === 'dark' ? preset.dark : preset.light;
+    
+    // Preserve the current viewport setting, only update styling
+    onChange({ 
+      ...targetTheme, 
+      viewport: config.viewport,
+      mode: config.mode 
+    });
+  };
+
   const handleModeChange = (mode: 'light' | 'dark') => {
     if (config.mode === mode) return;
-    
-    // Switch to shared defaults
-    const newTheme = mode === 'light' ? DEFAULT_LIGHT_THEME : DEFAULT_DARK_THEME;
-    onChange({ ...config, ...newTheme, mode });
+
+    // When switching mode, we look at the Default preset to get the correct base values for that mode
+    // This ensures we switch to the "Correct" Dark/Light version of the theme
+    // instead of just flipping the 'mode' string while keeping incongruent colors.
+    const defaultPreset = PRESETS.find(p => p.name === 'Default');
+    const targetBase = defaultPreset ? (mode === 'dark' ? defaultPreset.dark : defaultPreset.light) : (mode === 'dark' ? DEFAULT_DARK_THEME : DEFAULT_LIGHT_THEME);
+
+    onChange({ 
+        ...config, 
+        ...targetBase,
+        viewport: config.viewport // Preserve viewport
+    });
   };
 
   const filteredPalette = Object.entries(TAILWIND_PALETTE).filter(([name]) => 
@@ -168,33 +196,42 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
       <div className="flex-1 overflow-y-auto custom-scrollbar relative p-4 space-y-2">
         {activeTab === 'presets' && (
            <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-right-4 duration-300">
-                {PRESETS.map((preset) => (
-                    <button
-                        key={preset.name}
-                        onClick={() => onChange({ ...config, ...preset.config } as ThemeConfig)}
-                        className="group relative flex items-center gap-4 p-4 bg-muted/30 border border-border hover:border-primary/50 rounded-xl transition-all hover:shadow-xl text-left overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        
-                        <div className="flex -space-x-2 relative z-10">
-                            <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-30" style={{ backgroundColor: preset.config.background }}></div>
-                            <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-20" style={{ backgroundColor: preset.config.primaryColor }}></div>
-                            <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-10" style={{ backgroundColor: preset.config.sidebar }}></div>
-                        </div>
+                {PRESETS.map((preset) => {
+                    // Determine which visual variant to show based on current mode
+                    const currentVariant = config.mode === 'dark' ? preset.dark : preset.light;
+                    const isActive = config.primaryColor === currentVariant.primaryColor && config.background === currentVariant.background;
 
-                        <div className="relative z-10 flex-1">
-                            <span className="text-xs font-bold text-foreground block">{preset.name}</span>
-                            <span className="text-[10px] text-muted-foreground">{preset.description}</span>
-                        </div>
-
-                        {/* Active Indicator */}
-                        {config.primaryColor === preset.config.primaryColor && config.background === preset.config.background && (
-                            <div className="relative z-10 text-primary bg-primary/10 p-1.5 rounded-full">
-                                <Check size={14} />
+                    return (
+                        <button
+                            key={preset.name}
+                            onClick={() => handlePresetSelect(preset)}
+                            className={`group relative flex items-center gap-4 p-4 bg-muted/30 border rounded-xl transition-all hover:shadow-xl text-left overflow-hidden ${isActive ? 'border-primary/50 bg-primary/5' : 'border-border hover:border-primary/30'}`}
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <div className="flex -space-x-2 relative z-10">
+                                <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-30" style={{ backgroundColor: currentVariant.background }}></div>
+                                <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-20" style={{ backgroundColor: currentVariant.primaryColor }}></div>
+                                <div className="w-8 h-8 rounded-full shadow-lg ring-2 ring-card z-10" style={{ backgroundColor: currentVariant.sidebar }}></div>
                             </div>
-                        )}
-                    </button>
-                ))}
+
+                            <div className="relative z-10 flex-1">
+                                <span className="text-xs font-bold text-foreground block flex items-center gap-2">
+                                    {preset.name}
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-background border border-border text-muted-foreground uppercase">{config.mode}</span>
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">{preset.description}</span>
+                            </div>
+
+                            {/* Active Indicator */}
+                            {isActive && (
+                                <div className="relative z-10 text-primary bg-primary/10 p-1.5 rounded-full animate-in zoom-in-50 duration-200">
+                                    <Check size={14} />
+                                </div>
+                            )}
+                        </button>
+                    );
+                })}
            </div>
         )}
 

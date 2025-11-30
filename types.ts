@@ -1,5 +1,4 @@
 
-
 export enum NodeType {
   SERVICE = 'SERVICE',
   DATABASE = 'DATABASE',

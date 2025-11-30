@@ -177,8 +177,8 @@ export const DEFAULT_DARK_THEME: ThemeConfig = {
 };
 
 export const DEFAULT_LIGHT_THEME: ThemeConfig = {
-    ...DEFAULT_DARK_THEME,
-    mode: 'light',
+  ...DEFAULT_DARK_THEME,
+  mode: 'light',
   primaryColor: 'oklch(0.205 0 0)',
   primaryForeground: 'oklch(0.985 0 0)',
   secondaryColor: 'oklch(0.97 0 0)',
