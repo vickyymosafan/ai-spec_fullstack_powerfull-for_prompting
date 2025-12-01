@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ThemeConfig } from '../types';
 import { TAILWIND_PALETTE, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME } from '../lib/theme';
-import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette, Smartphone, Tablet, Monitor, Maximize, Laptop, Info } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette, Smartphone, Tablet, Monitor, Maximize, Laptop, Info, Waves } from 'lucide-react';
 
 interface ThemeEditorProps {
   config: ThemeConfig;
@@ -501,41 +501,9 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
         )}
 
         {activeTab === 'other' && (
-           <div className="p-1 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-             <div className="bg-muted/30 border border-border rounded-xl p-4 space-y-6">
-                <div className="flex items-center justify-between">
-                   <label className="text-xs font-bold text-foreground flex items-center gap-2">
-                     <Circle size={14} className="text-primary"/> Border Radius
-                   </label>
-                   <code className="text-[10px] font-mono text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded">
-                       {config.radius}rem
-                   </code>
-                </div>
-                
-                <div className="relative h-6 flex items-center">
-                    <div className="absolute w-full h-1 bg-border rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-primary" 
-                            style={{ width: `${(config.radius / 2) * 100}%` }}
-                        ></div>
-                    </div>
-                    <input 
-                    type="range" 
-                    min="0" 
-                    max="2" 
-                    step="0.05"
-                    value={config.radius}
-                    onChange={(e) => onChange({ ...config, radius: parseFloat(e.target.value) })}
-                    className="absolute w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div 
-                        className="w-4 h-4 bg-background rounded-full shadow-lg border-2 border-primary absolute pointer-events-none transition-all"
-                        style={{ left: `calc(${(config.radius / 2) * 100}% - 8px)` }}
-                    ></div>
-                </div>
-             </div>
-
-             <div className="bg-muted/30 border border-border rounded-xl p-1 grid grid-cols-2 gap-1">
+           <div className="p-4 space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+             
+             <div className="bg-muted/30 border border-border rounded-xl p-1 grid grid-cols-2 gap-1 mb-4">
                  <button 
                     onClick={() => handleModeChange('dark')}
                     className={`flex flex-col items-center justify-center py-4 rounded-lg transition-all ${config.mode === 'dark' ? 'bg-background text-foreground shadow-sm border border-border' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'}`}
@@ -550,6 +518,229 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
                     <Sun size={16} className="mb-2"/>
                     <span className="text-[10px] font-bold">Light Mode</span>
                  </button>
+             </div>
+
+             {/* Radius Section */}
+             <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+                <button 
+                    onClick={() => toggleSection('radius')}
+                    className="w-full flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors border-b border-border/50"
+                >
+                    <span className="text-xs font-bold text-foreground">Radius</span>
+                    <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-200 ${openSections['radius'] !== false ? 'rotate-180' : ''}`} />
+                </button>
+                {openSections['radius'] !== false && (
+                    <div className="p-4 space-y-6 bg-background/50">
+                        <div className="flex items-center justify-between">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Radius</label>
+                            <div className="flex items-center gap-1 bg-background border border-border rounded-lg px-2 py-1 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+                                <input 
+                                    type="number" 
+                                    step="0.05"
+                                    value={config.radius}
+                                    onChange={(e) => onChange({...config, radius: parseFloat(e.target.value)})}
+                                    className="w-12 bg-transparent text-xs text-right focus:outline-none font-mono"
+                                />
+                                <span className="text-[10px] text-muted-foreground font-mono">rem</span>
+                            </div>
+                        </div>
+                        <div className="relative h-6 flex items-center">
+                            <div className="absolute w-full h-1 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-primary" 
+                                    style={{ width: `${(config.radius / 2) * 100}%` }}
+                                ></div>
+                            </div>
+                            <input 
+                            type="range" 
+                            min="0" 
+                            max="2" 
+                            step="0.05"
+                            value={config.radius}
+                            onChange={(e) => onChange({ ...config, radius: parseFloat(e.target.value) })}
+                            className="absolute w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <div 
+                                className="w-4 h-4 bg-background rounded-full shadow-lg border-2 border-primary absolute pointer-events-none transition-all"
+                                style={{ left: `calc(${(config.radius / 2) * 100}% - 8px)` }}
+                            ></div>
+                        </div>
+                    </div>
+                )}
+             </div>
+
+             {/* Spacing Section */}
+             <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+                <button 
+                    onClick={() => toggleSection('spacing')}
+                    className="w-full flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors border-b border-border/50"
+                >
+                    <span className="text-xs font-bold text-foreground">Spacing</span>
+                    <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-200 ${openSections['spacing'] !== false ? 'rotate-180' : ''}`} />
+                </button>
+                {openSections['spacing'] !== false && (
+                    <div className="p-4 space-y-6 bg-background/50">
+                        <div className="flex items-center justify-between">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Spacing</label>
+                            <div className="flex items-center gap-1 bg-background border border-border rounded-lg px-2 py-1 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+                                <input 
+                                    type="number" 
+                                    step="0.05"
+                                    value={config.spacing}
+                                    onChange={(e) => onChange({...config, spacing: parseFloat(e.target.value)})}
+                                    className="w-12 bg-transparent text-xs text-right focus:outline-none font-mono"
+                                />
+                                <span className="text-[10px] text-muted-foreground font-mono">rem</span>
+                            </div>
+                        </div>
+                        <div className="relative h-6 flex items-center">
+                            <div className="absolute w-full h-1 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-primary" 
+                                    style={{ width: `${(config.spacing / 2) * 100}%` }}
+                                ></div>
+                            </div>
+                            <input 
+                            type="range" 
+                            min="0" 
+                            max="2" 
+                            step="0.05"
+                            value={config.spacing}
+                            onChange={(e) => onChange({ ...config, spacing: parseFloat(e.target.value) })}
+                            className="absolute w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <div 
+                                className="w-4 h-4 bg-background rounded-full shadow-lg border-2 border-primary absolute pointer-events-none transition-all"
+                                style={{ left: `calc(${(config.spacing / 2) * 100}% - 8px)` }}
+                            ></div>
+                        </div>
+                    </div>
+                )}
+             </div>
+
+             {/* Shadow Section */}
+             <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+                <button 
+                    onClick={() => toggleSection('shadow')}
+                    className="w-full flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors border-b border-border/50"
+                >
+                    <span className="text-xs font-bold text-foreground">Shadow</span>
+                    <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-200 ${openSections['shadow'] !== false ? 'rotate-180' : ''}`} />
+                </button>
+                {openSections['shadow'] !== false && (
+                    <div className="p-4 space-y-4 bg-background/50">
+                        
+                        {/* Shadow Color */}
+                        <ColorRow label="Shadow Color" field="shadowColor" value={config.shadowColor} />
+
+                        {/* Shadow Opacity */}
+                        <div className="space-y-3 pt-2">
+                             <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Shadow Opacity</label>
+                                <div className="bg-background border border-border rounded px-2 py-0.5 text-[10px] font-mono">{config.shadowOpacity.toFixed(2)}</div>
+                             </div>
+                             <input 
+                                type="range" 
+                                min="0" max="1" step="0.01" 
+                                value={config.shadowOpacity}
+                                onChange={(e) => onChange({...config, shadowOpacity: parseFloat(e.target.value)})}
+                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                             />
+                        </div>
+
+                        {/* Blur Radius */}
+                        <div className="space-y-3">
+                             <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Blur Radius</label>
+                                <div className="flex items-center gap-1 bg-background border border-border rounded px-2 py-0.5">
+                                    <input 
+                                        type="number" 
+                                        value={config.shadowBlur}
+                                        onChange={(e) => onChange({...config, shadowBlur: parseFloat(e.target.value)})}
+                                        className="w-8 bg-transparent text-[10px] text-right focus:outline-none font-mono"
+                                    />
+                                    <span className="text-[10px] text-muted-foreground font-mono">px</span>
+                                </div>
+                             </div>
+                             <input 
+                                type="range" 
+                                min="0" max="50" step="1" 
+                                value={config.shadowBlur}
+                                onChange={(e) => onChange({...config, shadowBlur: parseFloat(e.target.value)})}
+                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                             />
+                        </div>
+
+                        {/* Spread */}
+                        <div className="space-y-3">
+                             <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Spread</label>
+                                <div className="flex items-center gap-1 bg-background border border-border rounded px-2 py-0.5">
+                                    <input 
+                                        type="number" 
+                                        value={config.shadowSpread}
+                                        onChange={(e) => onChange({...config, shadowSpread: parseFloat(e.target.value)})}
+                                        className="w-8 bg-transparent text-[10px] text-right focus:outline-none font-mono"
+                                    />
+                                    <span className="text-[10px] text-muted-foreground font-mono">px</span>
+                                </div>
+                             </div>
+                             <input 
+                                type="range" 
+                                min="-20" max="20" step="1" 
+                                value={config.shadowSpread}
+                                onChange={(e) => onChange({...config, shadowSpread: parseFloat(e.target.value)})}
+                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                             />
+                        </div>
+
+                         {/* Offset X */}
+                         <div className="space-y-3">
+                             <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Offset X</label>
+                                <div className="flex items-center gap-1 bg-background border border-border rounded px-2 py-0.5">
+                                    <input 
+                                        type="number" 
+                                        value={config.shadowX}
+                                        onChange={(e) => onChange({...config, shadowX: parseFloat(e.target.value)})}
+                                        className="w-8 bg-transparent text-[10px] text-right focus:outline-none font-mono"
+                                    />
+                                    <span className="text-[10px] text-muted-foreground font-mono">px</span>
+                                </div>
+                             </div>
+                             <input 
+                                type="range" 
+                                min="-50" max="50" step="1" 
+                                value={config.shadowX}
+                                onChange={(e) => onChange({...config, shadowX: parseFloat(e.target.value)})}
+                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                             />
+                        </div>
+
+                         {/* Offset Y */}
+                         <div className="space-y-3">
+                             <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Offset Y</label>
+                                <div className="flex items-center gap-1 bg-background border border-border rounded px-2 py-0.5">
+                                    <input 
+                                        type="number" 
+                                        value={config.shadowY}
+                                        onChange={(e) => onChange({...config, shadowY: parseFloat(e.target.value)})}
+                                        className="w-8 bg-transparent text-[10px] text-right focus:outline-none font-mono"
+                                    />
+                                    <span className="text-[10px] text-muted-foreground font-mono">px</span>
+                                </div>
+                             </div>
+                             <input 
+                                type="range" 
+                                min="-50" max="50" step="1" 
+                                value={config.shadowY}
+                                onChange={(e) => onChange({...config, shadowY: parseFloat(e.target.value)})}
+                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                             />
+                        </div>
+                    </div>
+                )}
              </div>
            </div>
         )}

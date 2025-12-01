@@ -1,4 +1,5 @@
 
+
 export enum NodeType {
   SERVICE = 'SERVICE',
   DATABASE = 'DATABASE',
@@ -125,6 +126,16 @@ export interface ThemeConfig {
   letterSpacing: number; // in em
 
   radius: number; // in rem equivalent usually, e.g. 0.5
+  spacing: number; // in rem
+  
+  // Shadow
+  shadowColor: string;
+  shadowOpacity: number;
+  shadowX: number;
+  shadowY: number;
+  shadowBlur: number;
+  shadowSpread: number;
+
   style: 'default' | 'new-york' | 'flat';
   mode: 'light' | 'dark';
   

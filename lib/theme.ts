@@ -171,7 +171,14 @@ export const DEFAULT_DARK_THEME: ThemeConfig = {
   sidebarAccentForeground: 'oklch(0.985 0 0)',
   sidebarBorder: 'oklch(0.275 0 0)',
   sidebarRing: 'oklch(0.439 0 0)',
-  radius: 2,
+  radius: 0.625,
+  spacing: 0.25,
+  shadowColor: 'oklch(0 0 0)',
+  shadowOpacity: 0.1,
+  shadowX: 0,
+  shadowY: 1,
+  shadowBlur: 3,
+  shadowSpread: 0,
   mode: 'dark',
   style: 'default',
   viewport: 'responsive',
@@ -241,7 +248,26 @@ export const applyThemeToDocument = (theme: ThemeConfig) => {
     set('--border', theme.border);
     set('--input', theme.input);
     set('--ring', theme.ring);
+    
     set('--radius', `${theme.radius}rem`);
+    set('--spacing', `${theme.spacing}rem`);
+
+    set('--shadow-color', theme.shadowColor);
+    set('--shadow-opacity', theme.shadowOpacity.toString());
+    set('--shadow-x', `${theme.shadowX}px`);
+    set('--shadow-y', `${theme.shadowY}px`);
+    set('--shadow-blur', `${theme.shadowBlur}px`);
+    set('--shadow-spread', `${theme.shadowSpread}px`);
+    
+    // Static shadows injected as per requirements
+    set('--shadow-2xs', '0 1px 3px 0px hsl(0 0% 0% / 0.05)');
+    set('--shadow-xs', '0 1px 3px 0px hsl(0 0% 0% / 0.05)');
+    set('--shadow-sm', '0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10)');
+    set('--shadow', '0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10)');
+    set('--shadow-md', '0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10)');
+    set('--shadow-lg', '0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10)');
+    set('--shadow-xl', '0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10)');
+    set('--shadow-2xl', '0 1px 3px 0px hsl(0 0% 0% / 0.25)');
 
     set('--chart-1', theme.chart1);
     set('--chart-2', theme.chart2);
@@ -308,7 +334,22 @@ export const generateCssVariables = (theme: ThemeConfig): string => {
         `--font-serif: ${theme.fontSerif};`,
         `--font-mono: ${theme.fontMono};`,
         `--radius: ${theme.radius}rem;`,
-        `--tracking-normal: ${theme.letterSpacing}em;`
+        `--spacing: ${theme.spacing}rem;`,
+        `--tracking-normal: ${theme.letterSpacing}em;`,
+        `--shadow-color: ${theme.shadowColor};`,
+        `--shadow-opacity: ${theme.shadowOpacity};`,
+        `--shadow-x: ${theme.shadowX}px;`,
+        `--shadow-y: ${theme.shadowY}px;`,
+        `--shadow-blur: ${theme.shadowBlur}px;`,
+        `--shadow-spread: ${theme.shadowSpread}px;`,
+        `--shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);`,
+        `--shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);`,
+        `--shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);`,
+        `--shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);`,
+        `--shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);`,
+        `--shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);`,
+        `--shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);`,
+        `--shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);`,
     ];
 
     const cssContent = `
