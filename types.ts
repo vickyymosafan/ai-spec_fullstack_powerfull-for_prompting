@@ -118,6 +118,12 @@ export interface ThemeConfig {
   sidebarBorder?: string;
   sidebarRing?: string;
   
+  // Typography
+  fontSans: string;
+  fontSerif: string;
+  fontMono: string;
+  letterSpacing: number; // in em
+
   radius: number; // in rem equivalent usually, e.g. 0.5
   style: 'default' | 'new-york' | 'flat';
   mode: 'light' | 'dark';

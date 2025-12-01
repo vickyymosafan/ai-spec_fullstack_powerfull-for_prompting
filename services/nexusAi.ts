@@ -1,5 +1,3 @@
-
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { NexusBlueprint, NodeType, ThemeConfig } from "../types";
 
@@ -13,6 +11,16 @@ Misi: Merancang arsitektur perangkat lunak tingkat Enterprise yang sempurna, ama
 **ATURAN INTI GENERASI SPESIFIKASI (WAJIB DIPATUHI):**
 
 Tugas Anda adalah menghasilkan JSON yang berisi 4 "God Prompts" terpisah (requirementsSpec, frontendSpec, backendSpec, databaseSpec). Setiap spec harus ditulis dalam format Markdown yang sangat detail.
+
+**STRATEGI TECH STACK (SANGAT PENTING):**
+1. **ANALISIS INPUT USER:** Cek apakah user meminta teknologi spesifik dalam prompt (contoh: "Gunakan Vue.js dan Laravel", "Pakai Go Gin dan HTMX", "Backend Python FastAPI").
+2. **PRIORITAS USER (CUSTOM STACK):** Jika user meminta stack tertentu, **WAJIB** gunakan stack tersebut untuk seluruh spesifikasi. Jangan memaksakan stack default jika user sudah memiliki preferensi.
+3. **DEFAULT STACK (REKOMENDASI):** Jika dan HANYA JIKA user **TIDAK** menyebutkan tech stack (misal hanya meminta "Buat aplikasi E-Commerce" atau "Sistem ERP"), gunakan **MODERN TECH STACK** berikut:
+   - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS, Shadcn/UI.
+   - **State Management:** React Query v5 (Server State) + Zustand (Client State).
+   - **API Communication:** @ts-rest/react-query (Wajib untuk End-to-End Type-Safety).
+   - **Forms:** React Hook Form + Zod.
+   - **Backend:** NestJS (Clean Architecture) atau Next.js API Routes (tergantung kompleksitas).
 
 ---
 
@@ -231,74 +239,16 @@ Mode: Dual (Light/Dark)
 **Gaya Visual:** Modern Clean, **FLAT DESIGN (DILARANG GRADASI)**, **FULL ROUNDED (High Border Radius)**, Minimalis.
 **Struktur Konten Harus Mencakup:**
 1.  **Role & Tujuan:** Definisikan peran sebagai Lead FE Engineer. Tujuan: Performa tinggi (Core Web Vitals), Aksesibilitas (WCAG 2.1 AA), dan Scalability.
-2.  **Tech Stack & Struktur:** Next.js (App Router), TypeScript, Tailwind CSS, Shadcn/UI, **React Query v5**.
-3.  **Data Fetching & Type Safety (WAJIB: ts-rest + React Query v5):**
-    Anda **WAJIB** menggunakan library \`@ts-rest/react-query\` versi 5 untuk komunikasi dengan backend.
-    Jangan gunakan \`fetch\` atau \`axios\` manual. Gunakan pola RPC-like yang type-safe.
+2.  **Tech Stack Selection (SESUAIKAN DENGAN STRATEGI):**
+    *   **Custom:** Jika user meminta stack lain (misal Vue, Svelte, Angular), gunakan itu.
+    *   **Default:** Next.js (App Router), TypeScript, Tailwind CSS, Shadcn/UI, **React Query v5** (Server State) + **Zustand** (Client State), **React Hook Form + Zod**.
 
-    **Instruksi Implementasi Detail:**
-    *   **Installation:** \`pnpm add @ts-rest/react-query @tanstack/react-query@5\`.
-    *   **Setup Provider (app/providers.tsx):**
-        Pastikan \`tsr.ReactQueryProvider\` berada DI DALAM \`QueryClientProvider\`.
-        \`\`\`tsx
-        import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-        import { tsr } from './tsr';
-        
-        const queryClient = new QueryClient();
-        export function Providers({ children }) {
-          return (
-            <QueryClientProvider client={queryClient}>
-              <tsr.ReactQueryProvider>{children}</tsr.ReactQueryProvider>
-            </QueryClientProvider>
-          );
-        }
-        \`\`\`
-    
-    *   **Initialization (lib/tsr.ts):**
-        \`\`\`ts
-        import { initTsrReactQuery } from '@ts-rest/react-query/v5';
-        import { contract } from './contract';
-        export const tsr = initTsrReactQuery(contract, {
-          baseUrl: 'http://localhost:3333',
-          baseHeaders: { 'x-app-source': 'nexus-client' },
-        });
-        \`\`\`
-
-    *   **Fetching Data (Type-Safe Hooks):**
-        Gunakan \`tsr.[resource].[method].useQuery\`.
-        \`\`\`tsx
-        // Fully typed response data & error
-        const { data, isPending, error } = tsr.posts.get.useQuery({
-          queryKey: ['posts'],
-        });
-        
-        if (isPending) return <div>Loading...</div>;
-        if (data?.status === 200) {
-          return <ul>{data.body.map(post => <li key={post.id}>{post.title}</li>)}</ul>;
-        }
-        \`\`\`
-
-    *   **Mutation & Optimistic Updates (Advanced):**
-        Implementasikan \`useMutation\` dengan optimistic update manual via \`tsr.useQueryClient()\`.
-        \`\`\`tsx
-        const tsrQueryClient = tsr.useQueryClient(); // Extended QueryClient
-        const { mutate } = tsr.posts.create.useMutation({
-          onMutate: async (newPost) => {
-            await tsrQueryClient.posts.get.cancelQueries({ queryKey: ['posts'] });
-            const previousPosts = tsrQueryClient.posts.get.getQueryData(['posts']);
-            // Update cache optimistically
-            tsrQueryClient.posts.get.setQueryData(['posts'], (old) => ({
-              ...old,
-              body: [...old.body, { ...newPost.body, id: 'temp' }]
-            }));
-            return { previousPosts };
-          },
-          // ... onError (rollback) & onSettled (invalidate)
-        });
-        \`\`\`
-
-    *   **Error Handling (Type Guards):**
-        Gunakan helper \`isFetchError\`, \`isUnknownErrorResponse\`, dan \`exhaustiveGuard\` dari \`@ts-rest/react-query/v5\`.
+3.  **Data Fetching & Type Safety:**
+    *   **Jika Default Stack:** WAJIB instruksikan **@ts-rest/react-query** versi 5.
+        *   Instalasi: \`pnpm add @ts-rest/react-query @tanstack/react-query@5\`.
+        *   Setup \`tsr.ReactQueryProvider\` di \`app/providers.tsx\`.
+        *   Jelaskan penggunaan hook \`tsr.[resource].useQuery\` yang type-safe.
+    *   **Jika Custom Stack:** Gunakan library fetching yang relevan (misal Axios, Redux Toolkit Query, Apollo Client).
 
 4.  **Komponen UI:** List komponen atomik (Button, Modal, Toast) dan instruksi styling menggunakan CSS Variables dari blok [CSS_VARS].
 5.  **Responsive Design Strategy (CORE CONCEPT - ADAPTIVE UI):**
@@ -330,7 +280,7 @@ Mode: Dual (Light/Dark)
     \`\`\`
 
 6.  **Halaman Utama:** List halaman yang harus dibuat berdasarkan fitur aplikasi.
-7.  **Deploy & Vercel:** Instruksi spesifik deployment ke Vercel.
+7.  **Deploy & Vercel:** Instruksi spesifik deployment ke Vercel (jika Next.js) atau platform lain yang relevan.
 8.  **Maintainability:** Aturan ESLint, Prettier.
 
 ### 3. ATURAN GENERASI: BACKEND SPEC (backendSpec)
@@ -340,72 +290,30 @@ Bertindaklah sebagai: **Principal Backend Engineer**.
 
 **Struktur Konten & Tech Stack Harus Mencakup:**
 
-1.  **Tech Stack & Type Safety Strategy (WAJIB IMPLEMENTASI ts-rest):**
-    Anda **WAJIB** merekomendasikan pattern **ts-rest** untuk menjamin kesamaan tipe di Client & Server. Pilih salah satu framework di bawah ini (sesuaikan dengan preferensi user atau pilih **NestJS** sebagai default Enterprise Standard):
+1.  **Tech Stack Selection (SESUAIKAN DENGAN STRATEGI):**
+    *   **Custom:** Jika user meminta (misal: Go, Python FastAPI, Java Spring), buat arsitektur untuk bahasa tersebut.
+    *   **Default:** **NestJS** + **ts-rest** (The Enterprise Standard) atau **Next.js API Routes** (untuk project kecil/menengah).
 
-    *   **NestJS + ts-rest (The Enterprise Standard):**
-        *   Install: \`@ts-rest/nest\`.
-        *   **Multi Handler Approach (Recommended):** Gunakan decorator \`@TsRestHandler(contract)\` di Controller untuk mengimplementasikan seluruh sub-contract sekaligus.
-        *   Pastikan return value menggunakan helper \`tsRestHandler(contract, { ...Implementation... })\` untuk intellisense maksimal.
-        *   Ini memberikan **Compile-time safety**: jika contract berubah, kode backend akan error saat compile.
+2.  **API Standards & Contract Definition:**
+    *   **Jika TypeScript (NestJS/NextJS/Express):** WAJIB implementasi **ts-rest** (\`initContract\`) sebagai Single Source of Truth.
+        *   Contract di-share antara Frontend dan Backend.
+        *   Validasi runtime otomatis dengan Zod.
+    *   **Jika Bahasa Lain (Go/Python/dll):** WAJIB implementasi **OpenAPI (Swagger) Code-First**.
+        *   Definisikan \`openapi.yaml\` terlebih dahulu.
+        *   Generate interface/struct dari spec tersebut.
 
-    *   **Express + ts-rest:**
-        *   Install: \`@ts-rest/express\`.
-        *   Gunakan \`createExpressEndpoints(contract, router, app)\`.
-        *   Gunakan \`initServer().router(contract, { ...impl... })\` untuk implementasi logika endpoint.
-
-    *   **Fastify + ts-rest:**
-        *   Install: \`@ts-rest/fastify\`.
-        *   Gunakan \`initServer().router(contract, { ...impl... })\`.
-        *   Register plugin via \`app.register(s.plugin(router))\`.
-
-    *   **Next.js + ts-rest:**
-        *   Install: \`@ts-rest/next\`.
-        *   Implementasi API Routes menggunakan \`createNextRoute\` dan \`createNextRouter\`.
-        *   Aktifkan opsi \`{ jsonQuery: true, validateResponses: true }\` untuk validasi Zod otomatis.
-
-2.  **API Standards & Contract Definition (Shared Library):**
-    *   **Contract-First:** Semua endpoint, Zod Schema (Request/Response/Params/Query), dan HTTP Method didefinisikan terpisah di file \`contract.ts\` menggunakan \`initContract\`.
-    *   **Single Source of Truth:** Contract ini di-import oleh Frontend (React Query) dan Backend (Controller) untuk menghilangkan "API Drift".
-
-3.  **OpenAPI & Documentation Generation (WAJIB IMPLEMENTASI):**
-    Anda **WAJIB** menyertakan script/setup untuk generate \`openapi.json\` menggunakan library \`@ts-rest/open-api\`.
-    
-    *   **Installation:** \`pnpm add @ts-rest/open-api @anatine/zod-openapi\`.
-    *   **Schema Enhancement (Zod):**
-        Gunakan \`extendZodWithOpenApi(z)\` di awal file contract untuk mengaktifkan metadata OpenAPI.
-        Tambahkan metadata \`.openapi({ title: '...', description: '...', example: '...' })\` pada Zod Schema untuk dokumentasi yang lebih kaya.
-    
-    *   **Generation Script:**
-        Buat instruksi untuk file generate Swagger (misal: \`generate-openapi.ts\`). Gunakan konfigurasi:
-        \`\`\`ts
-        import { generateOpenApi } from '@ts-rest/open-api';
-        import { contract } from './contract';
-        
-        const openApiDocument = generateOpenApi(contract, {
-          info: { title: 'Project API', version: '1.0.0' }
-        }, {
-          setOperationId: true, // Generate readable Operation IDs
-          jsonQuery: true,      // Support JSON Query Params in Swagger
-        });
-        \`\`\`
-    
-    *   **Operation Mapping (Advanced Metadata):**
-        Jika ada kebutuhan custom tags atau security schemes (e.g. Bearer Auth), gunakan opsi \`operationMapper\`:
-        \`\`\`ts
-        operationMapper: (operation, appRoute) => ({
-          ...operation,
-          ...(appRoute.metadata?.openApiTags ? { tags: appRoute.metadata.openApiTags } : {}),
-        })
-        \`\`\`
+3.  **OpenAPI & Documentation Generation (WAJIB):**
+    *   Sertakan instruksi generate documentation (Swagger UI).
+    *   Jika ts-rest: Gunakan \`@ts-rest/open-api\`.
+    *   Jika lainnya: Gunakan tool native (misal \`swag\` untuk Go, \`fastapi.openapi\` untuk Python).
 
 4.  **Core Architecture:**
     *   Layering: Domain Entities -> Repositories -> Services -> Controllers/Handlers.
     *   Dependency Injection: Wajib digunakan.
-    *   Validation: Zod Schema di level Contract akan otomatis memvalidasi request sebelum masuk controller.
+    *   Validation: Zod (TS) atau Validator Struct (Go/Java).
 
 5.  **Security (Zero Trust):**
-    *   Type-Safe Error Handling: Gunakan \`TsRestException\` (NestJS) atau global error handler.
+    *   Type-Safe Error Handling.
     *   Auth: JWT/OAuth2 implementation.
     *   Rate Limiting & CORS.
 
@@ -418,7 +326,7 @@ Bertindaklah sebagai: **Database Reliability Engineer (DBRE)**.
 **Prinsip:** Data Integrity, ACID, High Availability.
 **Struktur Konten Harus Mencakup:**
 1.  **Role & Tujuan:** Mendesain skema yang efisien dan scalable.
-2.  **Teknologi:** PostgreSQL / MongoDB / Redis (Sesuai kebutuhan).
+2.  **Teknologi:** PostgreSQL / MongoDB / Redis (Sesuai kebutuhan atau permintaan user).
 3.  **Schema Design:** ERD text representation. Definisi tabel/koleksi, tipe data, primary/foreign keys.
 4.  **Indexing Strategy:** Jelaskan index apa yang harus dibuat untuk query yang sering diakses.
 5.  **Performance Tuning:** Partitioning strategy, Denormalization rules.

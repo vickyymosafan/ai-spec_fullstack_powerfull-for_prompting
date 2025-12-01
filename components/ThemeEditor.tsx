@@ -1,8 +1,9 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ThemeConfig } from '../types';
 import { TAILWIND_PALETTE, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME } from '../lib/theme';
-import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette, Smartphone, Tablet, Monitor, Maximize, Laptop } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Wand2, Circle, Check, ChevronDown, Search, X, Moon, Sun, Shuffle, Type, LayoutTemplate, Palette, Smartphone, Tablet, Monitor, Maximize, Laptop, Info } from 'lucide-react';
 
 interface ThemeEditorProps {
   config: ThemeConfig;
@@ -305,13 +306,122 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
         )}
 
         {activeTab === 'typography' && (
-           <div className="p-10 flex flex-col items-center justify-center h-full text-muted-foreground text-center space-y-4">
-              <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center border border-border">
-                  <Type size={32} className="opacity-50"/>
+           <div className="p-4 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              
+              {/* Alert */}
+              <div className="bg-muted/30 border border-border rounded-xl p-4 flex gap-3 items-start">
+                  <div className="mt-0.5 text-muted-foreground"><Info size={16}/></div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">
+                      To use custom fonts, embed them in your project. See <a href="#" className="underline decoration-muted-foreground/50 underline-offset-4 hover:text-primary">Tailwind docs</a> for details.
+                  </div>
               </div>
-              <div>
-                  <h3 className="text-sm font-bold text-foreground mb-1">Typography Engine</h3>
-                  <p className="text-xs max-w-[200px]">Font customization is locked in the free version of Nexus Zero.</p>
+
+              {/* Font Family Section */}
+              <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+                  <button 
+                      onClick={() => toggleSection('fontFamily')}
+                      className="w-full flex items-center justify-between p-3 bg-muted/30 border-b border-border/50 hover:bg-muted/50 transition-colors"
+                  >
+                      <h4 className="text-xs font-bold text-foreground">Font Family</h4>
+                      <ChevronDown size={14} className="text-muted-foreground"/>
+                  </button>
+                  <div className="p-4 space-y-4">
+                      {/* Sans */}
+                      <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Sans-Serif Font</label>
+                          <div className="relative">
+                              <select 
+                                value={config.fontSans}
+                                onChange={(e) => onChange({...config, fontSans: e.target.value})}
+                                className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary appearance-none transition-shadow"
+                              >
+                                  <option value="'Rajdhani', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif">Rajdhani (Default)</option>
+                                  <option value="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">System UI</option>
+                                  <option value="'Inter', sans-serif">Inter</option>
+                                  <option value="'Roboto', sans-serif">Roboto</option>
+                                  <option value="'Open Sans', sans-serif">Open Sans</option>
+                              </select>
+                              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={14} />
+                          </div>
+                      </div>
+                       {/* Serif */}
+                      <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Serif Font</label>
+                          <div className="relative">
+                              <select 
+                                value={config.fontSerif}
+                                onChange={(e) => onChange({...config, fontSerif: e.target.value})}
+                                className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary appearance-none transition-shadow"
+                              >
+                                  <option value="ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif">System Serif</option>
+                                  <option value="'Merriweather', serif">Merriweather</option>
+                                  <option value="'Playfair Display', serif">Playfair Display</option>
+                                  <option value="'Lora', serif">Lora</option>
+                              </select>
+                              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={14} />
+                          </div>
+                      </div>
+                      {/* Mono */}
+                      <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Monospace Font</label>
+                          <div className="relative">
+                              <select 
+                                value={config.fontMono}
+                                onChange={(e) => onChange({...config, fontMono: e.target.value})}
+                                className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary appearance-none transition-shadow"
+                              >
+                                  <option value="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace">JetBrains Mono (Default)</option>
+                                  <option value="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace">System Mono</option>
+                                  <option value="'Fira Code', monospace">Fira Code</option>
+                                  <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                              </select>
+                              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={14} />
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              {/* Letter Spacing Section */}
+              <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+                   <div className="p-3 bg-muted/30 border-b border-border">
+                      <h4 className="text-xs font-bold text-foreground">Letter Spacing</h4>
+                  </div>
+                  <div className="p-4 space-y-6">
+                       <div className="flex items-center justify-between">
+                           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Letter Spacing</label>
+                           <div className="flex items-center gap-1 bg-background border border-border rounded-lg px-2 py-1 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+                               <input 
+                                  type="number" 
+                                  step="0.01"
+                                  value={config.letterSpacing}
+                                  onChange={(e) => onChange({...config, letterSpacing: parseFloat(e.target.value)})}
+                                  className="w-12 bg-transparent text-xs text-right focus:outline-none font-mono"
+                               />
+                               <span className="text-[10px] text-muted-foreground font-mono">em</span>
+                           </div>
+                       </div>
+                       <div className="relative h-6 flex items-center">
+                            <div className="absolute w-full h-1 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-primary transition-all duration-75" 
+                                    style={{ width: `${Math.min(100, Math.max(0, ((config.letterSpacing + 0.1) / 0.6) * 100))}%` }}
+                                ></div>
+                            </div>
+                            <input 
+                                type="range"
+                                min="-0.1"
+                                max="0.5"
+                                step="0.01"
+                                value={config.letterSpacing}
+                                onChange={(e) => onChange({...config, letterSpacing: parseFloat(e.target.value)})}
+                                className="absolute w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <div 
+                                className="w-4 h-4 bg-background rounded-full shadow-md border-2 border-primary absolute pointer-events-none transition-transform duration-75"
+                                style={{ left: `calc(${Math.min(100, Math.max(0, ((config.letterSpacing + 0.1) / 0.6) * 100))}% - 8px)` }}
+                            ></div>
+                       </div>
+                  </div>
               </div>
            </div>
         )}

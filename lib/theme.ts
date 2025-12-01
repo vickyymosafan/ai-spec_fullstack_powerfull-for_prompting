@@ -1,4 +1,5 @@
 
+
 import { ThemeConfig } from '../types';
 
 // Full Tailwind CSS Palette Map (OKLCH)
@@ -173,7 +174,11 @@ export const DEFAULT_DARK_THEME: ThemeConfig = {
   radius: 2,
   mode: 'dark',
   style: 'default',
-  viewport: 'responsive'
+  viewport: 'responsive',
+  fontSans: 'Rajdhani, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+  fontSerif: 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+  fontMono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+  letterSpacing: 0,
 };
 
 export const DEFAULT_LIGHT_THEME: ThemeConfig = {
@@ -253,6 +258,11 @@ export const applyThemeToDocument = (theme: ThemeConfig) => {
     set('--sidebar-border', theme.sidebarBorder);
     set('--sidebar-ring', theme.sidebarRing);
 
+    set('--font-sans', theme.fontSans);
+    set('--font-serif', theme.fontSerif);
+    set('--font-mono', theme.fontMono);
+    set('--tracking-normal', `${theme.letterSpacing}em`);
+
     if (theme.mode === 'dark') {
       root.classList.add('dark');
     } else {
@@ -294,10 +304,11 @@ export const generateCssVariables = (theme: ThemeConfig): string => {
         `--sidebar-accent-foreground: ${theme.sidebarAccentForeground || 'oklch(0.985 0 0)'};`,
         `--sidebar-border: ${theme.sidebarBorder || 'oklch(0.275 0 0)'};`,
         `--sidebar-ring: ${theme.sidebarRing || 'oklch(0.439 0 0)'};`,
-        `--font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';`,
-        `--font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;`,
-        `--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;`,
-        `--radius: ${theme.radius}rem;`
+        `--font-sans: ${theme.fontSans};`,
+        `--font-serif: ${theme.fontSerif};`,
+        `--font-mono: ${theme.fontMono};`,
+        `--radius: ${theme.radius}rem;`,
+        `--tracking-normal: ${theme.letterSpacing}em;`
     ];
 
     const cssContent = `
