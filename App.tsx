@@ -1,7 +1,8 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { analyzeArchitecture } from './services/nexusAi';
-import { NexusBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
+import { VickyBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
 import { NodeCanvas } from './components/NodeCanvas';
 import { SimulationHub } from './components/SimulationHub';
 import { ThemeEditor } from './components/ThemeEditor';
@@ -36,7 +37,7 @@ const App: React.FC = () => {
   }, [themeConfig]);
 
   // State: Blueprint History & Persistence
-  const [blueprintHistory, setBlueprintHistory] = useState<NexusBlueprint[]>([]);
+  const [blueprintHistory, setBlueprintHistory] = useState<VickyBlueprint[]>([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState<number>(-1);
 
   const currentBlueprint = currentHistoryIndex >= 0 && blueprintHistory.length > 0 
@@ -45,7 +46,7 @@ const App: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'nexus', content: 'vickymosafan ONLINE. SIAP MENERIMA INPUT ARSITEKTUR.', timestamp: Date.now() }
+    { role: 'vicky', content: 'vickymosafan ONLINE. SIAP MENERIMA INPUT ARSITEKTUR.', timestamp: Date.now() }
   ]);
   
   // MAIN VIEW STATE
@@ -60,14 +61,14 @@ const App: React.FC = () => {
 
   // --- 1. LOCAL STORAGE PERSISTENCE ---
   useEffect(() => {
-    const saved = localStorage.getItem('nexus_blueprints_v2');
+    const saved = localStorage.getItem('vicky_blueprints_v2');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setBlueprintHistory(parsed);
           setCurrentHistoryIndex(parsed.length - 1);
-          setMessages(prev => [...prev, { role: 'nexus', content: 'Memori Inti dipulihkan. Melanjutkan sesi sebelumnya.', timestamp: Date.now() }]);
+          setMessages(prev => [...prev, { role: 'vicky', content: 'Memori Inti dipulihkan. Melanjutkan sesi sebelumnya.', timestamp: Date.now() }]);
         }
       } catch (e) {
         console.error("Core Dump Corrupted:", e);
@@ -80,15 +81,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (blueprintHistory.length > 0) {
-      localStorage.setItem('nexus_blueprints_v2', JSON.stringify(blueprintHistory));
+      localStorage.setItem('vicky_blueprints_v2', JSON.stringify(blueprintHistory));
     } else {
-      localStorage.removeItem('nexus_blueprints_v2');
+      localStorage.removeItem('vicky_blueprints_v2');
     }
   }, [blueprintHistory]);
 
   const handleNewProject = () => {
     setCurrentHistoryIndex(-1);
-    setMessages([{ role: 'nexus', content: 'Sistem Direset. Memulai Proyek Baru.', timestamp: Date.now() }]);
+    setMessages([{ role: 'vicky', content: 'Sistem Direset. Memulai Proyek Baru.', timestamp: Date.now() }]);
     setInput('');
     setSelectedNode(null);
     setActiveTab('console');
@@ -96,7 +97,7 @@ const App: React.FC = () => {
 
   const handleLoadProject = (index: number) => {
     setCurrentHistoryIndex(index);
-    setMessages([{ role: 'nexus', content: `Memuat cetak biru: ${blueprintHistory[index].name}`, timestamp: Date.now() }]);
+    setMessages([{ role: 'vicky', content: `Memuat cetak biru: ${blueprintHistory[index].name}`, timestamp: Date.now() }]);
     setActiveTab('overview');
     setSelectedNode(null);
   };
@@ -123,7 +124,7 @@ const App: React.FC = () => {
       if (stepIndex < thinkingSteps.length) {
          setMessages(prev => {
             const clean = prev.filter(m => !m.content.startsWith("STATUS:"));
-            return [...clean, { role: 'nexus', content: `STATUS: ${thinkingSteps[stepIndex]}`, timestamp: Date.now() }];
+            return [...clean, { role: 'vicky', content: `STATUS: ${thinkingSteps[stepIndex]}`, timestamp: Date.now() }];
          });
          stepIndex++;
       }
@@ -139,7 +140,7 @@ const App: React.FC = () => {
 
       setMessages(prev => {
          const clean = prev.filter(m => !m.content.startsWith("STATUS:"));
-         return [...clean, { role: 'nexus', content: `Analisis Selesai. Cetak biru '${result.name}' telah dibuat.`, timestamp: Date.now() }];
+         return [...clean, { role: 'vicky', content: `Analisis Selesai. Cetak biru '${result.name}' telah dibuat.`, timestamp: Date.now() }];
       });
       
       // Auto switch to overview after generation
@@ -147,7 +148,7 @@ const App: React.FC = () => {
 
     } catch (error) {
       clearInterval(interval);
-      setMessages(prev => [...prev, { role: 'nexus', content: 'ERROR: Kegagalan Singularitas. Coba lagi.', timestamp: Date.now() }]);
+      setMessages(prev => [...prev, { role: 'vicky', content: 'ERROR: Kegagalan Singularitas. Coba lagi.', timestamp: Date.now() }]);
     } finally {
       setLoading(false);
     }
@@ -173,7 +174,11 @@ const App: React.FC = () => {
     const dynamicCss = generateCssVariables(themeConfig);
     const cssRegex = /\[CSS_VARS\][\s\S]*?\[\/CSS_VARS\]/g;
 
-    return cssRegex.test(spec) ? spec.replace(cssRegex, dynamicCss) : spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n${dynamicCss}`);
+    // If tag exists, replace entire block (including tags) with clean CSS content
+    // Otherwise fallback to appending clean CSS wrapped in markdown code block
+    return cssRegex.test(spec) 
+      ? spec.replace(cssRegex, dynamicCss) 
+      : spec.replace('[/THEME_CONFIG]', `[/THEME_CONFIG]\n\n\`\`\`css\n${dynamicCss}\n\`\`\``);
   }, [currentBlueprint, themeConfig]);
 
   // --- METRIC CALCS ---
@@ -247,9 +252,9 @@ const App: React.FC = () => {
           <div className="bg-card border border-border p-8 rounded-xl w-full max-w-lg shadow-2xl relative overflow-hidden text-card-foreground">
              <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
              <button onClick={() => setShowGitModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X size={24}/></button>
-             <h2 className="text-2xl font-bold mb-2 flex items-center gap-3 font-mono"><GitBranch className="text-primary" size={28}/> NEXUS GIT SYNC</h2>
+             <h2 className="text-2xl font-bold mb-2 flex items-center gap-3 font-mono"><GitBranch className="text-primary" size={28}/> VICKY GIT SYNC</h2>
              <p className="text-muted-foreground text-sm mb-6">Push architecture specs to remote repository.</p>
-             <button onClick={() => { setLoading(true); setTimeout(() => { setLoading(false); setShowGitModal(false); setMessages(prev => [...prev, {role: 'nexus', content: 'GIT SYNC BERHASIL: Artifacts pushed.', timestamp: Date.now()}]) }, 1500); }} className="w-full bg-primary text-primary-foreground py-3 rounded font-bold">PUSH CHANGES</button>
+             <button onClick={() => { setLoading(true); setTimeout(() => { setLoading(false); setShowGitModal(false); setMessages(prev => [...prev, {role: 'vicky', content: 'GIT SYNC BERHASIL: Artifacts pushed.', timestamp: Date.now()}]) }, 1500); }} className="w-full bg-primary text-primary-foreground py-3 rounded font-bold">PUSH CHANGES</button>
           </div>
         </div>
       )}
@@ -612,12 +617,12 @@ const App: React.FC = () => {
                       <div className="flex-1 overflow-y-auto space-y-6 pb-32 p-4 custom-scrollbar">
                          {messages.map((msg, i) => (
                             <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'nexus' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                                  {msg.role === 'nexus' ? <Activity size={16} /> : <User size={16} />}
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'vicky' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                                  {msg.role === 'vicky' ? <Activity size={16} /> : <User size={16} />}
                                </div>
                                <div className={`flex flex-col max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                                   <div className={`p-4 rounded-2xl text-sm border shadow-sm ${msg.role === 'user' ? 'bg-primary/10 border-primary/20 text-foreground rounded-tr-none' : 'bg-card border-border text-foreground rounded-tl-none'}`}>
-                                     {msg.role === 'nexus' && <span className="text-[10px] font-bold text-primary mb-2 block tracking-wider">NEXUS AI</span>}
+                                     {msg.role === 'vicky' && <span className="text-[10px] font-bold text-primary mb-2 block tracking-wider">VICKY AI</span>}
                                      <p className="whitespace-pre-wrap font-mono leading-relaxed">{msg.content}</p>
                                   </div>
                                   <span className="text-[10px] text-muted-foreground mt-1 px-1">{new Date(msg.timestamp).toLocaleTimeString()}</span>

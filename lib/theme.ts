@@ -361,5 +361,6 @@ export const generateCssVariables = (theme: ThemeConfig): string => {
   ${vars.join('\n  ')}
 }
 `;
-    return `[CSS_VARS]${cssContent}[/CSS_VARS]`;
+    // Removed wrapper tags to avoid duplicate blocks in UI
+    return cssContent.trim();
 };

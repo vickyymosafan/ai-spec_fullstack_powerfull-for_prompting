@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { NexusBlueprint, NodeType, ThemeConfig } from "../types";
+import { VickyBlueprint, NodeType, ThemeConfig } from "../types";
 
 // Note: Using process.env.API_KEY as per instructions
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -334,11 +334,11 @@ Bertindaklah sebagai: **Database Reliability Engineer (DBRE)**.
 
 ---
 
-**FORMAT OUTPUT UTAMA (NexusBlueprint JSON):**
+**FORMAT OUTPUT UTAMA (VickyBlueprint JSON):**
 Pastikan field \`requirementsSpec\`, \`frontendSpec\`, \`backendSpec\`, dan \`databaseSpec\` berisi teks Markdown panjang yang mengikuti struktur di atas dengan bahasa Indonesia yang profesional, tegas, dan instruktif.
 `;
 
-export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfig): Promise<NexusBlueprint> => {
+export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfig): Promise<VickyBlueprint> => {
   const model = "gemini-3-pro-preview";
   
   // Create theme context string if exists
@@ -425,7 +425,7 @@ export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfi
       contents: `Permintaan Arsitektur: "${userPrompt}".
       ${themeContext}
       
-      Hasilkan JSON NexusBlueprint yang valid.
+      Hasilkan JSON VickyBlueprint yang valid.
       Pastikan 'requirementsSpec', 'frontendSpec', 'backendSpec', dan 'databaseSpec' SANGAT PANJANG, DETAIL, dan mengikuti struktur 'ATURAN INTI GENERASI SPESIFIKASI' di System Instructions.
       
       Fokus Requirements: User Story & Acceptance Criteria (Gherkin/BDD Syntax).
@@ -444,11 +444,11 @@ export const analyzeArchitecture = async (userPrompt: string, theme?: ThemeConfi
     const text = response.text;
     if (!text) throw new Error("Sistem tidak merespons (Empty Output).");
     
-    const parsedData = JSON.parse(text) as NexusBlueprint;
+    const parsedData = JSON.parse(text) as VickyBlueprint;
     parsedData.timestamp = Date.now();
     return parsedData;
   } catch (error) {
-    console.error("NEXUS ZERO CORE ERROR:", error);
+    console.error("VICKY ZERO CORE ERROR:", error);
     throw error;
   }
 };

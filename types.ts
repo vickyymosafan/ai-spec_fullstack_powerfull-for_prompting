@@ -44,7 +44,7 @@ export interface SimulationMetric {
   errors: number; // error rate %
 }
 
-export interface NexusBlueprint {
+export interface VickyBlueprint {
   projectId: string;
   name: string;
   timestamp?: number; // Created at timestamp
@@ -62,7 +62,7 @@ export interface NexusBlueprint {
 }
 
 export interface ChatMessage {
-  role: 'user' | 'nexus';
+  role: 'user' | 'vicky';
   content: string;
   timestamp: number;
 }

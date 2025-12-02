@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { NexusBlueprint, NodeType, NodeData } from '../types';
+import { VickyBlueprint, NodeType, NodeData } from '../types';
 import { Server, Database, Activity, Cloud, Globe, Layers, Cpu } from 'lucide-react';
 
 interface NodeCanvasProps {
-  blueprint: NexusBlueprint | null;
+  blueprint: VickyBlueprint | null;
   onNodeSelect: (node: NodeData) => void;
   techFilter: string | null;
 }
