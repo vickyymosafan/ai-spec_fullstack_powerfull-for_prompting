@@ -12,7 +12,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DEFAULT_DARK_THEME, applyThemeToDocument, generateCssVariables } from './lib/theme';
 import { 
-  Mic, Send, ShieldAlert, Terminal, Activity, Code, Save, 
+  Send, ShieldAlert, Terminal, Activity, Code, Save, 
   GitBranch, Filter, X, Copy, Check, Layout, Settings,
   Plus, Menu, LayoutDashboard, Network, FileCode, Command, ChevronDown,
   Bell, Search as SearchIcon, User, LogOut, ChevronRight,
@@ -659,7 +659,6 @@ const App: React.FC = () => {
                          </div>
                          <div className="flex justify-between mt-2 px-1 max-w-4xl mx-auto">
                             <div className="flex gap-4 text-[10px] text-muted-foreground font-mono">
-                               <span className="flex items-center gap-1.5 hover:text-foreground cursor-pointer transition-colors"><Mic size={10}/> Voice Inactive</span>
                                <span className="flex items-center gap-1.5 hover:text-foreground cursor-pointer transition-colors"><Terminal size={10}/> Bash Mode</span>
                             </div>
                             <span className="text-[10px] text-muted-foreground">{input.length} chars</span>
