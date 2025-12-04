@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { analyzeArchitecture } from './services/nexusAi';
 import { VickyBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
@@ -18,6 +17,19 @@ import {
   Bell, Search as SearchIcon, User, LogOut, ChevronRight,
   PanelLeftClose
 } from 'lucide-react';
+
+// Custom Vicky AI Logo Component
+const VickyLogo = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5"/>
+    <path d="M7.5 9L12 17L16.5 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 17V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2 2"/>
+    <circle cx="12" cy="17" r="2" className="fill-current" />
+    <circle cx="7.5" cy="9" r="1.5" className="fill-current" />
+    <circle cx="16.5" cy="9" r="1.5" className="fill-current" />
+    <circle cx="12" cy="12" r="1" className="fill-current" fillOpacity="0.5" />
+  </svg>
+);
 
 const App: React.FC = () => {
   const [input, setInput] = useState('');
@@ -279,7 +291,7 @@ const App: React.FC = () => {
                 {!isSidebarCollapsed ? (
                    <div className="flex items-center gap-3 overflow-hidden">
                       <div className="w-8 h-8 bg-sidebar-primary rounded-lg flex items-center justify-center text-sidebar-primary-foreground shadow-sm shrink-0">
-                         <Activity size={18} />
+                         <VickyLogo size={20} />
                       </div>
                       <div className="flex flex-col min-w-0">
                          <h1 className="text-sm font-bold tracking-tight text-sidebar-foreground truncate">vickymosafan</h1>
@@ -288,7 +300,7 @@ const App: React.FC = () => {
                    </div>
                 ) : (
                   <div className="w-9 h-9 bg-sidebar-primary rounded-lg flex items-center justify-center text-sidebar-primary-foreground shadow-sm">
-                      <Activity size={20} />
+                      <VickyLogo size={22} />
                   </div>
                 )}
                 
@@ -618,7 +630,7 @@ const App: React.FC = () => {
                          {messages.map((msg, i) => (
                             <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'vicky' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                                  {msg.role === 'vicky' ? <Activity size={16} /> : <User size={16} />}
+                                  {msg.role === 'vicky' ? <VickyLogo size={16} /> : <User size={16} />}
                                </div>
                                <div className={`flex flex-col max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                                   <div className={`p-4 rounded-2xl text-sm border shadow-sm ${msg.role === 'user' ? 'bg-primary/10 border-primary/20 text-foreground rounded-tr-none' : 'bg-card border-border text-foreground rounded-tl-none'}`}>
