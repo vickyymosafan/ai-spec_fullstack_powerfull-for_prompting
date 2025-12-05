@@ -75,9 +75,13 @@ Bertindaklah sebagai: **Principal Backend Engineer**.
     *   Terapkan **Clean Architecture** (Entities, Use Cases, Controllers, Gateways) apapun bahasanya.
     *   Prinsip **SOLID** dan **DRY**.
 
-3.  **API Standards:**
-    *   Definisikan kontrak API (OpenAPI/Swagger).
-    *   Jika menggunakan TypeScript, wajibkan **ts-rest**.
+3.  **API Documentation (OPENAPI/SWAGGER - WAJIB):**
+    *   **Specification:** Wajib menyertakan dokumentasi OpenAPI 3.0.
+    *   **Endpoints:** Daftar lengkap endpoint (Method, Path, Description).
+    *   **Schemas:** Definisi Request Body dan Response Schemas (DTOs).
+    *   **Security Schemes:** Jelaskan implementasi auth (Bearer Auth/OAuth2) di dalam spec.
+    *   **Code Snippet:** Berikan contoh definisi OpenAPI (YAML/JSON) untuk endpoint utama.
+    *   Jika menggunakan TypeScript, wajibkan **ts-rest** untuk type-safety.
 
 4.  **Security:** Authentication (JWT/OAuth), Authorization (RBAC), Input Validation, Rate Limiting.
 
