@@ -54,9 +54,14 @@ Sertakan blok [THEME_CONFIG] dan [CSS_VARS] di bagian paling atas. (Gunakan temp
 1.  **Tech Stack (CEK INPUT USER):**
     *   Jika user minta "Vue", gunakan Vue.js + Pinia.
     *   Jika user minta "React" atau diam, gunakan Next.js + Zustand + React Query.
-2.  **Struktur Folder & Komponen:** Jelaskan struktur direktori.
-3.  **State Management:** Jelaskan strategi (Server State vs Client State).
-4.  **Integration:** Jelaskan cara connect ke Backend (Axios/Fetch/TanStack Query).
+2.  **Component Architecture & Reusability:**
+    *   Jelaskan struktur komponen (Atomic Design atau Feature-based).
+    *   **Smart vs Dumb Components:** Pisahkan logic (Container) dari UI (Presentational).
+    *   **Reusability Practices:** Penggunaan Props interface, Slots/Children, dan Custom Hooks untuk logic yang berulang.
+    *   **Framework Specifics:** Jika Next.js, jelaskan strategi Server Components (RSC) vs Client Components.
+3.  **Struktur Folder & Komponen:** Jelaskan struktur direktori lengkap.
+4.  **State Management:** Jelaskan strategi (Server State vs Client State).
+5.  **Integration:** Jelaskan cara connect ke Backend (Axios/Fetch/TanStack Query).
 
 ---
 
@@ -75,7 +80,13 @@ Bertindaklah sebagai: **Principal Backend Engineer**.
     *   Terapkan **Clean Architecture** (Entities, Use Cases, Controllers, Gateways) apapun bahasanya.
     *   Prinsip **SOLID** dan **DRY**.
 
-3.  **API Documentation (OPENAPI/SWAGGER - WAJIB):**
+3.  **API Gateway Pattern:**
+    *   **Responsibilities:** Jelaskan peran gateway untuk Request Routing dan Reverse Proxying.
+    *   **Authentication & Security:** Verifikasi token (JWT) di edge, SSL Termination, dan CORS policy.
+    *   **Traffic Control:** Strategi Rate Limiting (Throttling) dan Circuit Breaker untuk mencegah overload.
+    *   **Protocol Translation:** Jika menggunakan microservices (misal gRPC), jelaskan bagaimana gateway mentranslasikan ke HTTP/REST untuk client frontend.
+
+4.  **API Documentation (OPENAPI/SWAGGER - WAJIB):**
     *   **Specification:** Wajib menyertakan dokumentasi OpenAPI 3.0.
     *   **Endpoints:** Daftar lengkap endpoint (Method, Path, Description).
     *   **Schemas:** Definisi Request Body dan Response Schemas (DTOs).
@@ -83,7 +94,9 @@ Bertindaklah sebagai: **Principal Backend Engineer**.
     *   **Code Snippet:** Berikan contoh definisi OpenAPI (YAML/JSON) untuk endpoint utama.
     *   Jika menggunakan TypeScript, wajibkan **ts-rest** untuk type-safety.
 
-4.  **Security:** Authentication (JWT/OAuth), Authorization (RBAC), Input Validation, Rate Limiting.
+5.  **Security Implementation:**
+    *   Detail implementasi Authentication (JWT/OAuth) dan Authorization (RBAC).
+    *   Input Validation (Zod/Class Validator).
 
 ---
 

@@ -1,12 +1,15 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { analyzeArchitecture } from './services/nexusAi';
-import { VickyBlueprint, ChatMessage, NodeData, ThemeConfig } from './types';
+import { VickyBlueprint, ChatMessage, NodeData, ThemeConfig, Task } from './types';
 import { NodeCanvas } from './components/NodeCanvas';
 import { SimulationHub } from './components/SimulationHub';
 import { ThemeEditor } from './components/ThemeEditor';
 import { MetricCard } from './components/MetricCard';
 import { RecentActivity } from './components/RecentActivity';
+import { ConsoleInterface } from './components/ConsoleInterface';
+import { ProjectTasks } from './components/ProjectTasks';
+import { VickyLogo } from './components/Icons';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DEFAULT_DARK_THEME, applyThemeToDocument, generateCssVariables } from './lib/theme';
@@ -15,25 +18,10 @@ import {
   GitBranch, Filter, X, Copy, Check, Layout, Settings,
   Plus, Menu, LayoutDashboard, Network, FileCode, Command, ChevronDown,
   Bell, Search as SearchIcon, User, LogOut, ChevronRight,
-  PanelLeftClose, MessageSquare
+  PanelLeftClose, MessageSquare, ListTodo
 } from 'lucide-react';
 
-// Custom Vicky AI Logo Component
-const VickyLogo = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5"/>
-    <path d="M7.5 9L12 17L16.5 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 17V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2 2"/>
-    <circle cx="12" cy="17" r="2" className="fill-current" />
-    <circle cx="7.5" cy="9" r="1.5" className="fill-current" />
-    <circle cx="16.5" cy="9" r="1.5" className="fill-current" />
-    <circle cx="12" cy="12" r="1" className="fill-current" fillOpacity="0.5" />
-  </svg>
-);
-
 const App: React.FC = () => {
-  const [input, setInput] = useState('');
-  
   // Theme State
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>(DEFAULT_DARK_THEME);
   const [showThemePanel, setShowThemePanel] = useState(false);
@@ -43,9 +31,6 @@ const App: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
 
-  // Chat Auto Scroll
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  
   // --- STYLE INJECTION FOR REALTIME THEME ---
   useEffect(() => {
     applyThemeToDocument(themeConfig);
@@ -65,7 +50,7 @@ const App: React.FC = () => {
   ]);
   
   // MAIN VIEW STATE
-  const [activeTab, setActiveTab] = useState<'overview' | 'topology' | 'code' | 'console' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'topology' | 'code' | 'console' | 'settings' | 'tasks'>('overview');
   const [codeSubTab, setCodeSubTab] = useState<'infrastructure' | 'requirements' | 'frontend' | 'backend' | 'database'>('infrastructure');
   
   // Interactions
@@ -73,16 +58,6 @@ const App: React.FC = () => {
   const [techFilter, setTechFilter] = useState<string | null>(null);
   const [showGitModal, setShowGitModal] = useState(false);
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
-
-  // Auto Scroll Chat
-  useEffect(() => {
-    if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTo({
-            top: chatContainerRef.current.scrollHeight,
-            behavior: 'smooth'
-        });
-    }
-  }, [messages]);
 
   // --- 1. LOCAL STORAGE PERSISTENCE ---
   useEffect(() => {
@@ -115,7 +90,6 @@ const App: React.FC = () => {
   const handleNewProject = () => {
     setCurrentHistoryIndex(-1);
     setMessages([{ role: 'vicky', content: 'System Reset. Initializing New Project.', timestamp: Date.now() }]);
-    setInput('');
     setSelectedNode(null);
     setActiveTab('console');
   };
@@ -127,12 +101,18 @@ const App: React.FC = () => {
     setSelectedNode(null);
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
+  const handleUpdateTasks = (newTasks: Task[]) => {
+    if (!currentBlueprint) return;
+    
+    const updatedBlueprint = { ...currentBlueprint, tasks: newTasks };
+    const updatedHistory = [...blueprintHistory];
+    updatedHistory[currentHistoryIndex] = updatedBlueprint;
+    setBlueprintHistory(updatedHistory);
+  };
 
-    const userMsg: ChatMessage = { role: 'user', content: input, timestamp: Date.now() };
+  const handleSendMessage = async (text: string) => {
+    const userMsg: ChatMessage = { role: 'user', content: text, timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
-    setInput('');
     setLoading(true);
 
     const thinkingSteps = [
@@ -333,6 +313,7 @@ const App: React.FC = () => {
                   <NavItem id="overview" icon={LayoutDashboard} label="Dashboard" />
                   <NavItem id="topology" icon={Network} label="Topology Map" />
                   <NavItem id="code" icon={FileCode} label="Code Specs" />
+                  <NavItem id="tasks" icon={ListTodo} label="Roadmap" />
                   <NavItem id="console" icon={Terminal} label="Console AI" hasBadge={true} />
                 </div>
 
@@ -626,88 +607,29 @@ const App: React.FC = () => {
                       </div>
                    </div>
                 )}
+                
+                {/* TASKS TAB */}
+                {activeTab === 'tasks' && currentBlueprint && (
+                   <ProjectTasks 
+                      tasks={currentBlueprint.tasks || []} 
+                      onUpdate={handleUpdateTasks} 
+                   />
+                )}
+                {activeTab === 'tasks' && !currentBlueprint && (
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 select-none border border-dashed border-white/10 rounded-xl bg-white/5">
+                     <ListTodo size={48} className="mb-4 opacity-20" />
+                     <p className="font-mono text-xs tracking-widest">INITIALIZE PROJECT TO MANAGE TASKS</p>
+                  </div>
+                )}
 
                 {/* CONSOLE TAB (CHAT) */}
                 {activeTab === 'console' && (
-                   <div className="h-full flex flex-col max-w-5xl mx-auto animate-in fade-in duration-500 relative bg-black/20 rounded-t-2xl border-x border-t border-white/5 backdrop-blur-sm shadow-2xl">
-                      {/* Console Header */}
-                      <div className="h-10 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between rounded-t-2xl">
-                         <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-                            <Terminal size={12} />
-                            <span>vicky_terminal_v4.2</span>
-                         </div>
-                         <div className="flex gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-white/20"></div>
-                            <div className="w-2 h-2 rounded-full bg-white/20"></div>
-                         </div>
-                      </div>
-
-                      <div className="flex-1 overflow-y-auto space-y-6 pb-32 p-6 custom-scrollbar" ref={chatContainerRef}>
-                         {messages.map((msg, i) => (
-                            <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in slide-in-from-bottom-2 duration-300`}>
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-lg border ${msg.role === 'vicky' ? 'bg-black/40 border-primary/30 text-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]' : 'bg-white/10 border-white/10 text-foreground'}`}>
-                                  {msg.role === 'vicky' ? <VickyLogo size={18} /> : <User size={16} />}
-                               </div>
-                               <div className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                  <div className={`
-                                     relative p-5 rounded-2xl text-sm border shadow-md backdrop-blur-md
-                                     ${msg.role === 'user' 
-                                       ? 'bg-primary/10 border-primary/20 text-foreground rounded-tr-sm' 
-                                       : 'bg-card/60 border-white/10 text-foreground rounded-tl-sm shadow-[0_4px_20px_rgba(0,0,0,0.3)]'}
-                                  `}>
-                                     {msg.role === 'vicky' && (
-                                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/5">
-                                           <span className="text-[10px] font-bold text-primary tracking-widest uppercase">VICKY AI</span>
-                                           <span className="text-[10px] font-mono text-muted-foreground">{new Date(msg.timestamp).toLocaleTimeString()}</span>
-                                        </div>
-                                     )}
-                                     <p className="whitespace-pre-wrap font-mono leading-relaxed text-[13px]">{msg.content}</p>
-                                     {msg.role === 'vicky' && <div className="absolute -left-1 top-4 w-1 h-8 bg-primary/50 rounded-r"></div>}
-                                  </div>
-                                  {msg.role === 'user' && <span className="text-[10px] text-muted-foreground mt-1 px-1 opacity-50">{new Date(msg.timestamp).toLocaleTimeString()}</span>}
-                               </div>
-                            </div>
-                         ))}
-                         {loading && (
-                            <div className="flex items-center gap-3 text-primary text-xs font-mono ml-14 p-3 bg-primary/5 border border-primary/10 rounded-lg w-fit animate-pulse">
-                               <span className="relative flex h-2 w-2">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                               </span>
-                               PROCESSING NEURAL ARCHITECTURE...
-                            </div>
-                         )}
-                      </div>
-                      
-                      {/* Floating Input Area */}
-                      <div className="absolute bottom-6 left-6 right-6 z-20">
-                         <div className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-purple-600/50 rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                            <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl flex flex-col shadow-2xl">
-                                <textarea
-                                   value={input}
-                                   onChange={(e) => setInput(e.target.value)}
-                                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                                   placeholder="Describe your architectural requirements (e.g. 'Microservices for E-Commerce using Go and gRPC')..."
-                                   className="w-full bg-transparent p-4 pr-16 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none min-h-[60px] max-h-[200px] resize-none font-mono"
-                                />
-                                <div className="flex items-center justify-between px-4 pb-3 pt-1 border-t border-white/5 bg-white/5 rounded-b-xl">
-                                    <div className="flex gap-3 text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
-                                       <span className="flex items-center gap-1.5 hover:text-primary cursor-pointer transition-colors"><Terminal size={10}/> Command Mode</span>
-                                       <span className="flex items-center gap-1.5 hover:text-primary cursor-pointer transition-colors"><Code size={10}/> RAW Input</span>
-                                    </div>
-                                    <button 
-                                      onClick={handleSend}
-                                      disabled={loading || !input.trim()}
-                                      className="p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all disabled:opacity-50 hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
-                                    >
-                                       <Send size={16} />
-                                    </button>
-                                </div>
-                            </div>
-                         </div>
-                      </div>
-                   </div>
+                  <ConsoleInterface 
+                    messages={messages} 
+                    loading={loading} 
+                    onSendMessage={handleSendMessage}
+                    onClear={() => setMessages([])} 
+                  />
                 )}
              </div>
 

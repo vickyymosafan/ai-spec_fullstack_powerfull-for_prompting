@@ -44,6 +44,15 @@ export interface SimulationMetric {
   errors: number; // error rate %
 }
 
+export interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  dueDate?: string; // ISO Date YYYY-MM-DD
+  priority: 'low' | 'medium' | 'high';
+  createdAt: number;
+}
+
 export interface VickyBlueprint {
   projectId: string;
   name: string;
@@ -59,6 +68,8 @@ export interface VickyBlueprint {
   frontendSpec: string;
   backendSpec: string;
   databaseSpec: string;
+  // Project Management
+  tasks?: Task[];
 }
 
 export interface ChatMessage {
