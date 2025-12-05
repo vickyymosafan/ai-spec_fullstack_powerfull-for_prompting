@@ -1,7 +1,8 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { VickyBlueprint, NodeType, NodeData } from '../types';
-import { Server, Database, Activity, Cloud, Globe, Layers, Cpu } from 'lucide-react';
+import { Server, Database, Activity, Cloud, Globe, Layers, Cpu, Box } from 'lucide-react';
 
 interface NodeCanvasProps {
   blueprint: VickyBlueprint | null;
@@ -16,6 +17,7 @@ const getIcon = (type: NodeType) => {
     case NodeType.GATEWAY: return Cloud;
     case NodeType.CLIENT: return Globe;
     case NodeType.CACHE: return Cpu;
+    case NodeType.QUEUE: return Box;
     default: return Layers;
   }
 };
@@ -57,10 +59,10 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
 
     // D3 Simulation Setup
     const simulation = d3.forceSimulation(d3Nodes as d3.SimulationNodeDatum[])
-      .force("link", d3.forceLink(d3Links).id((d: any) => d.id).distance(180))
-      .force("charge", d3.forceManyBody().strength(-400))
+      .force("link", d3.forceLink(d3Links).id((d: any) => d.id).distance(150))
+      .force("charge", d3.forceManyBody().strength(-500))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collide", d3.forceCollide().radius(80));
+      .force("collide", d3.forceCollide().radius(70));
 
     simulation.on("tick", () => {
       setNodes([...d3Nodes]);
@@ -73,7 +75,7 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
       simulation.stop();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blueprint?.timestamp, techFilter]); // Re-run only if blueprint changes (new generation) or filter changes
+  }, [blueprint?.timestamp, techFilter]);
 
   // Drag Handling Logic
   const handleMouseDown = (e: React.MouseEvent, node: any) => {
@@ -110,55 +112,70 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
   };
 
   if (!blueprint) return (
-    <div className="w-full h-full flex flex-col items-center justify-center text-primary font-mono select-none">
-       <div className="relative w-24 h-24 mb-4">
-          <div className="absolute inset-0 border-4 border-primary/30 rounded-full animate-ping"></div>
-          <div className="absolute inset-2 border-4 border-primary/50 rounded-full animate-spin"></div>
-          <Activity className="absolute inset-0 m-auto text-primary animate-pulse" size={32} />
+    <div className="w-full h-full flex flex-col items-center justify-center text-primary font-mono select-none bg-background/50">
+       <div className="relative w-32 h-32 mb-6">
+          <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+          <div className="absolute inset-4 border-2 border-primary/40 rounded-full animate-[spin_5s_linear_infinite_reverse]"></div>
+          <div className="absolute inset-8 border-2 border-primary/60 rounded-full animate-[spin_2s_linear_infinite]"></div>
+          <Activity className="absolute inset-0 m-auto text-primary animate-pulse" size={40} />
        </div>
-       <span className="tracking-[0.3em] text-xs animate-pulse">MENUNGGU NEURAL LINK...</span>
+       <span className="tracking-[0.5em] text-xs font-bold animate-pulse text-muted-foreground">AWAITING NEURAL SYNC</span>
     </div>
   );
 
   return (
-    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-background select-none cursor-crosshair">
-      <div className="absolute inset-0 grid-bg pointer-events-none"></div>
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-background/50 select-none cursor-crosshair">
+      {/* Dynamic Grid Background */}
+      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-background/10 to-background/80 pointer-events-none"></div>
 
       <svg className="w-full h-full absolute inset-0 pointer-events-none z-0">
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="var(--primary)" fillOpacity="0.5" />
+            <polygon points="0 0, 10 3.5, 0 7" fill="var(--primary)" fillOpacity="0.8" />
           </marker>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
         </defs>
         <g>
           {links.map((link, i) => (
             <React.Fragment key={i}>
+              {/* Data packet animation */}
+              <circle r="3" fill="var(--primary)">
+                <animateMotion 
+                  dur={`${Math.max(0.8, 2 - (link.latency / 300))}s`} 
+                  repeatCount="indefinite"
+                  path={`M${link.source.x},${link.source.y} L${link.target.x},${link.target.y}`}
+                  keyPoints="0;1"
+                  keyTimes="0;1"
+                  calcMode="linear"
+                />
+              </circle>
+              {/* Base Line */}
               <line
                 x1={link.source.x}
                 y1={link.source.y}
                 x2={link.target.x}
                 y2={link.target.y}
                 stroke="var(--border)"
-                strokeWidth="2"
+                strokeWidth="1"
+                opacity="0.3"
               />
-              <line
-                x1={link.source.x}
-                y1={link.source.y}
-                x2={link.target.x}
-                y2={link.target.y}
-                stroke="var(--primary)"
-                strokeWidth="1.5"
-                strokeOpacity="0.4"
-                markerEnd="url(#arrowhead)"
-                strokeDasharray="4,4"
-              />
-               <circle r="2" fill="var(--chart-2)">
-                <animateMotion 
-                  dur={`${Math.max(0.5, 3 - (link.latency / 200))}s`} 
-                  repeatCount="indefinite"
-                  path={`M${link.source.x},${link.source.y} L${link.target.x},${link.target.y}`}
-                />
-              </circle>
+              {/* Protocol overlay */}
+              <text 
+                 x={(link.source.x + link.target.x) / 2} 
+                 y={(link.source.y + link.target.y) / 2}
+                 textAnchor="middle" 
+                 fill="var(--muted-foreground)"
+                 fontSize="9"
+                 dy="-5"
+                 opacity="0.7"
+                 className="font-mono bg-background"
+              >
+                  {link.protocol}
+              </text>
             </React.Fragment>
           ))}
         </g>
@@ -167,9 +184,9 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
       {nodes.map((node) => {
         const Icon = getIcon(node.type);
         const statusColors = {
-          critical: 'border-destructive/80 shadow-[0_0_20px_rgba(239,68,68,0.4)] bg-destructive/20',
-          warning: 'border-yellow-500/80 shadow-[0_0_20px_rgba(234,179,8,0.4)] bg-yellow-500/20',
-          optimal: 'border-primary/50 shadow-[0_0_15px_rgba(6,182,212,0.2)] bg-card/90'
+          critical: 'border-destructive shadow-[0_0_20px_rgba(239,68,68,0.5)] bg-destructive/10 text-destructive',
+          warning: 'border-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)] bg-yellow-500/10 text-yellow-500',
+          optimal: 'border-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.3)] bg-background/80 text-primary'
         };
 
         return (
@@ -179,30 +196,36 @@ export const NodeCanvas: React.FC<NodeCanvasProps> = ({ blueprint, onNodeSelect,
             onClick={(e) => {
               if(!isDragging) onNodeSelect(node);
             }}
-            className={`absolute flex flex-col items-center justify-center p-3 rounded-xl border backdrop-blur-md transition-all duration-200 cursor-pointer hover:scale-105 z-10 hover:border-foreground/50 group ${statusColors[node.status]}`}
+            className={`
+                absolute flex flex-col items-center justify-center p-3 
+                backdrop-blur-md transition-all duration-300 z-10 
+                border hover:scale-110 group hover:z-20
+                ${statusColors[node.status]}
+                before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none
+            `}
             style={{ 
               left: node.x, 
               top: node.y, 
               transform: 'translate(-50%, -50%)',
-              width: '150px'
+              width: '140px',
+              borderRadius: '12px',
             }}
           >
-            {/* Connection Node Decorators */}
-            <div className="absolute -left-1 top-1/2 w-1.5 h-1.5 bg-muted-foreground rounded-full"></div>
-            <div className="absolute -right-1 top-1/2 w-1.5 h-1.5 bg-muted-foreground rounded-full"></div>
+            {/* Tech Badge */}
+            <div className="absolute -top-3 bg-background border border-border px-2 py-0.5 rounded text-[9px] font-mono text-muted-foreground uppercase tracking-wider shadow-sm">
+                {node.tech}
+            </div>
 
-            <div className={`p-2.5 rounded-full mb-2 bg-background/40 border border-foreground/10 group-hover:border-foreground/30 transition-colors`}>
-              <Icon size={20} className={node.status === 'critical' ? 'text-destructive' : 'text-primary'} />
+            <div className={`p-2 rounded-lg mb-2 bg-background/50 border border-white/5 shadow-inner`}>
+              <Icon size={24} className="opacity-90" />
             </div>
             
-            <div className="text-[11px] font-bold text-foreground text-center leading-tight tracking-wide font-mono mb-1">{node.label}</div>
-            <div className="text-[9px] text-muted-foreground font-mono px-2 py-0.5 bg-background/30 rounded border border-foreground/5">{node.tech}</div>
+            <div className="text-[11px] font-bold text-foreground text-center leading-tight tracking-wide font-mono w-full truncate px-1">
+                {node.label}
+            </div>
             
-            {node.status !== 'optimal' && (
-               <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-destructive rounded-full border-2 border-background animate-bounce shadow-lg">
-                 <span className="text-[10px] font-bold text-destructive-foreground">!</span>
-               </div>
-            )}
+            {/* Status Indicator Dot */}
+            <div className={`absolute bottom-2 right-2 w-1.5 h-1.5 rounded-full ${node.status === 'optimal' ? 'bg-emerald-500 animate-pulse' : 'bg-current'}`}></div>
           </div>
         );
       })}

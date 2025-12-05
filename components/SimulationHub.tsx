@@ -10,13 +10,16 @@ interface SimulationHubProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-popover border border-border p-3 rounded shadow-xl font-mono text-xs text-popover-foreground">
-        <p className="text-muted-foreground mb-1 font-bold">Time: {label}</p>
+      <div className="bg-background/90 backdrop-blur border border-border p-3 rounded-lg shadow-xl font-mono text-xs text-foreground ring-1 ring-white/10">
+        <p className="text-muted-foreground mb-2 font-bold tracking-wider">TIME: {label}</p>
         {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ color: entry.color }} className="flex justify-between gap-4">
-            <span>{entry.name}:</span>
-            <span className="font-bold">{entry.value}</span>
-          </p>
+          <div key={index} className="flex items-center justify-between gap-6 mb-1">
+            <span style={{ color: entry.color }} className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: entry.color}}></span>
+                {entry.name}
+            </span>
+            <span className="font-bold font-mono">{entry.value}</span>
+          </div>
         ))}
       </div>
     );
@@ -28,27 +31,27 @@ export const SimulationHub: React.FC<SimulationHubProps> = ({ data }) => {
   return (
     <div className="w-full h-full flex flex-col">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.4}/>
+              <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.3}/>
               <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0}/>
             </linearGradient>
             <linearGradient id="colorLatency" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.4}/>
+              <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.3}/>
               <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} opacity={0.5} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} opacity={0.3} />
           <XAxis 
             dataKey="time" 
-            tick={{fontSize: 10, fill: 'var(--muted-foreground)'}} 
+            tick={{fontSize: 10, fill: 'var(--muted-foreground)', fontFamily: 'var(--font-mono)'}} 
             axisLine={false}
             tickLine={false}
             dy={10}
           />
           <YAxis 
-            tick={{fontSize: 10, fill: 'var(--muted-foreground)'}} 
+            tick={{fontSize: 10, fill: 'var(--muted-foreground)', fontFamily: 'var(--font-mono)'}} 
             axisLine={false}
             tickLine={false}
           />
@@ -60,7 +63,8 @@ export const SimulationHub: React.FC<SimulationHubProps> = ({ data }) => {
             fillOpacity={1} 
             fill="url(#colorLoad)" 
             strokeWidth={2} 
-            name="Load" 
+            name="Load"
+            animationDuration={1500}
           />
           <Area 
             type="monotone" 
@@ -70,6 +74,7 @@ export const SimulationHub: React.FC<SimulationHubProps> = ({ data }) => {
             fill="url(#colorLatency)" 
             strokeWidth={2} 
             name="Latency (ms)" 
+            animationDuration={1500}
           />
         </AreaChart>
       </ResponsiveContainer>
