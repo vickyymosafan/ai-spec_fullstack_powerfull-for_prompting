@@ -44,6 +44,14 @@ export const ConsoleInterface: React.FC<ConsoleInterfaceProps> = ({
     inputRef.current?.focus();
   }, []);
 
+  // Auto-resize textarea
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 200)}px`;
+    }
+  }, [input]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -64,7 +72,7 @@ export const ConsoleInterface: React.FC<ConsoleInterfaceProps> = ({
     <div className="h-full flex flex-col max-w-5xl mx-auto animate-in fade-in duration-500 relative bg-black/40 rounded-t-2xl border-x border-t border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
       
       {/* Terminal Header */}
-      <div className="h-12 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between select-none">
+      <div className="h-12 bg-white/5 border-b border-white/5 flex items-center px-4 justify-between select-none shrink-0">
          <div className="flex items-center gap-3">
             <div className="flex gap-1.5">
                <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/50 hover:bg-red-500 transition-colors"></div>
@@ -201,18 +209,15 @@ export const ConsoleInterface: React.FC<ConsoleInterfaceProps> = ({
                <span className="tracking-wider">PROCESSING NEURAL ARCHITECTURE...</span>
             </div>
          )}
-         
-         {/* Spacing for bottom input */}
-         <div className="h-24"></div>
       </div>
       
-      {/* Floating Input Area */}
-      <div className="absolute bottom-6 left-6 right-6 z-20">
+      {/* Input Area (Flex Item) */}
+      <div className="p-6 pt-2 z-20 shrink-0">
          <div className="relative group">
             {/* Input Glow */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-purple-600/30 rounded-xl blur opacity-20 group-hover:opacity-50 transition duration-500 group-focus-within:opacity-70"></div>
+            <div className={`absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-purple-600/30 rounded-xl blur opacity-20 group-hover:opacity-50 transition duration-500 group-focus-within:opacity-70 ${loading ? 'hidden' : ''}`}></div>
             
-            <div className="relative bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl flex flex-col shadow-2xl transition-all duration-300 group-focus-within:border-primary/50 group-focus-within:bg-black/90">
+            <div className={`relative bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl flex flex-col shadow-2xl transition-all duration-300 group-focus-within:border-primary/50 group-focus-within:bg-black/90 ${loading ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
                 <div className="flex items-start">
                    <div className="pt-4 pl-4 text-primary animate-pulse">
                       <ChevronRight size={18} />
@@ -222,9 +227,11 @@ export const ConsoleInterface: React.FC<ConsoleInterfaceProps> = ({
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Describe architectural requirements..."
-                      className="w-full bg-transparent p-4 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none min-h-[50px] max-h-[200px] resize-none font-mono"
+                      disabled={loading}
+                      placeholder={loading ? "System processing..." : "Describe architectural requirements..."}
+                      className="w-full bg-transparent p-4 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none min-h-[56px] max-h-[200px] resize-none font-mono"
                       rows={1}
+                      style={{ height: 'auto' }}
                    />
                    <button 
                       onClick={() => { if(input.trim() && !loading) { onSendMessage(input); setInput(''); } }}
