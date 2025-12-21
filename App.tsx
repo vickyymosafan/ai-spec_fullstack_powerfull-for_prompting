@@ -14,11 +14,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DEFAULT_DARK_THEME, applyThemeToDocument, generateCssVariables } from './lib/theme';
 import { 
-  Send, ShieldAlert, Terminal, Activity, Code, Save, 
-  GitBranch, Filter, X, Copy, Check, Layout, Settings,
+  ShieldAlert, Terminal, Activity, Code, 
+  GitBranch, Filter, X, Copy, Check, Settings,
   Plus, Menu, LayoutDashboard, Network, FileCode, Command, ChevronDown,
   Bell, Search as SearchIcon, User, LogOut, ChevronRight,
-  PanelLeftClose, MessageSquare, ListTodo
+  PanelLeftClose, ListTodo
 } from 'lucide-react';
 
 const App: React.FC = () => {
