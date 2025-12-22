@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Task } from '../types';
-import { Plus, Calendar, Trash2, CheckCircle2, Circle, Flag, Clock } from 'lucide-react';
+import { Plus, Calendar, Trash2, CheckCircle2, Circle, Flag, Clock, AlertCircle, X } from 'lucide-react';
 
 interface ProjectTasksProps {
   tasks: Task[];
@@ -12,10 +12,16 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({ tasks, onUpdate }) =
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDate, setNewTaskDate] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  
+  // Confirmation State
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const handleAddTask = () => {
+  const handleTriggerConfirm = () => {
     if (!newTaskTitle.trim()) return;
+    setShowConfirmModal(true);
+  };
 
+  const handleConfirmAdd = () => {
     const newTask: Task = {
       id: Math.random().toString(36).substr(2, 9),
       title: newTaskTitle,
@@ -29,6 +35,7 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({ tasks, onUpdate }) =
     setNewTaskTitle('');
     setNewTaskDate('');
     setNewTaskPriority('medium');
+    setShowConfirmModal(false);
   };
 
   const toggleTask = (taskId: string) => {
@@ -63,8 +70,51 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({ tasks, onUpdate }) =
   };
 
   return (
-    <div className="h-full flex flex-col bg-card/30 backdrop-blur-md border border-border/50 rounded-xl shadow-lg overflow-hidden animate-in fade-in duration-300">
+    <div className="h-full flex flex-col bg-card/30 backdrop-blur-md border border-border/50 rounded-xl shadow-lg overflow-hidden animate-in fade-in duration-300 relative">
       
+      {/* CONFIRMATION MODAL */}
+      {showConfirmModal && (
+        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card border border-white/10 p-6 rounded-2xl w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
+             <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary/10 rounded-full text-primary">
+                   <AlertCircle size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">Confirm Task</h3>
+             </div>
+             
+             <div className="space-y-3 mb-6">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                   Are you sure you want to add this task to the roadmap?
+                </p>
+                <div className="p-3 bg-white/5 rounded-lg border border-white/5 space-y-1">
+                   <div className="text-xs font-bold text-primary truncate">{newTaskTitle}</div>
+                   <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                      <Calendar size={10} /> {newTaskDate || 'No date set'}
+                      <span className="opacity-30">•</span>
+                      <Flag size={10} className={getPriorityColor(newTaskPriority)} /> {newTaskPriority.toUpperCase()}
+                   </div>
+                </div>
+             </div>
+
+             <div className="flex gap-2">
+                <button 
+                  onClick={() => setShowConfirmModal(false)}
+                  className="flex-1 py-2 text-xs font-bold text-muted-foreground hover:bg-white/5 rounded-lg transition-colors border border-transparent"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmAdd}
+                  className="flex-1 py-2 text-xs font-bold bg-primary text-primary-foreground rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
+                >
+                  Add Task
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
+
       {/* Header & Add Task Form */}
       <div className="p-6 border-b border-white/5 bg-black/20">
         <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4 font-sans flex items-center gap-2">
@@ -77,7 +127,7 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({ tasks, onUpdate }) =
               type="text"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+              onKeyDown={(e) => e.key === 'Enter' && handleTriggerConfirm()}
               placeholder="Add a new task..."
               className="w-full h-10 bg-background/50 border border-white/10 rounded-lg pl-4 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
             />
@@ -107,7 +157,7 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({ tasks, onUpdate }) =
              </div>
 
              <button
-               onClick={handleAddTask}
+               onClick={handleTriggerConfirm}
                disabled={!newTaskTitle.trim()}
                className="h-10 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-primary/20"
              >

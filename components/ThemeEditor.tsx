@@ -69,7 +69,8 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ config, onChange }) =>
     }
   };
 
-  const ColorRow = ({ label, field, value }: { label: string, field: keyof ThemeConfig, value: string }) => (
+  // Fixed: Use React.FC to properly type the internal component and support standard props like 'key'
+  const ColorRow: React.FC<{ label: string, field: keyof ThemeConfig, value: string }> = ({ label, field, value }) => (
     <div className="mb-3">
       <label className="text-[10px] font-bold text-muted-foreground mb-1 block uppercase tracking-wider">{label}</label>
       <div className="flex items-center gap-2">
